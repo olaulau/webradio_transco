@@ -1,15 +1,19 @@
 <?php
 
+require_once 'StartStop.class.php';
+
 // register shutdown callback, to stop the stream server
 function shutdown()
 {
-	exec('./stop.sh');
+	StartStop::stop();
 }
 register_shutdown_function('shutdown');
 
 
 // start the stream server
-exec('./start.sh');
+StartStop::start();
+
+
 
 // wait for the HTTP server to respond
 function test_http() {
