@@ -22,6 +22,7 @@ cvlc -vvv http://hd.stream.frequence3.net/frequence3.flac --sout '#transcode{aco
 
 notes :
 http://fr2.php.net/manual/en/function.register-shutdown-function.php
+http://fr2.php.net/manual/en/function.pcntl-signal.php
 
 http://hirntier.blogspot.fr/2011/10/on-demand-audio-streaming-with-icecast.html
 
