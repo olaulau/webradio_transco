@@ -1,18 +1,27 @@
 <?php
 
 require_once 'StartStop.class.php';
+require_once 'Stream.class.php';
+
+
+// DB
+Stream::prepare_db();
+
 
 // register shutdown callback, to stop the stream server
 function shutdown()
 {
-	StartStop::stop();
+// 	StartStop::stop();
+	$stream = Stream::get_the_stream(1);
+	$stream->stop(1);
 }
 register_shutdown_function('shutdown');
 
 
 // start the stream server
-StartStop::start();
-
+// StartStop::start();
+$stream = Stream::get_the_stream(1);
+$stream->start(1);
 
 
 // wait for the HTTP server to respond
@@ -23,7 +32,6 @@ function test_http() {
 while(!test_http()) {
 	usleep(100*1000); // 0.1s 
 }
-
 
 
 // start streaming

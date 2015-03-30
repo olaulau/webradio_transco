@@ -42,8 +42,8 @@ class Process {
     }
 
     public function start(){
-        if ($this->command != ''
-        		)$this->runCom();
+        if ($this->command != '')
+        	$this->runCom();
         else
         	return true;
     }
