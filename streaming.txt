@@ -1,0 +1,30 @@
+apache + php + vlc
+
+
+fait :
+- 2 connections vers 1 serveur HTTP inclu dans la diffusion VLC :
+=> 1 seul flux original : ca rempli donc le rôle de icecast
+- vérifier qu'un client comme VLC suit bien les redirections HTTP (302)
+	sinon il faudra faire un reverse proxy HTTP avec apache
+=> marche ! suffit d'un .htaccess avec un truc comme ca dedans :
+	RewriteEngine On
+	RewriteRule ^(.*)$ http://localhost:8000/ [R=301,L]
+- lancer et quitter le VLC transcodeur avec un script CLI
+=> ok avec une ligne comme celle-ci :
+cvlc -vvv http://hd.stream.frequence3.net/frequence3.flac --sout '#transcode{acodec=vorb,ab=256} :standard{access=http,mux=ogg,dst=:8000/}'
+
+
+
+à faire :
+- intégrer ca dans un wrapper PHP, avec compteur de listener
+- interface web pour tout ca ?
+
+
+notes :
+http://fr2.php.net/manual/en/function.register-shutdown-function.php
+
+http://hirntier.blogspot.fr/2011/10/on-demand-audio-streaming-with-icecast.html
+
+https://wiki.videolan.org/Documentation:Streaming_HowTo/Command_Line_Examples/#HTTP_streaming
+https://wiki.videolan.org/Documentation:Streaming_HowTo/Advanced_Streaming_Using_the_Command_Line/#acodec
+https://wiki.videolan.org/VLC_command-line_help
