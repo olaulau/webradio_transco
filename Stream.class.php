@@ -1,5 +1,7 @@
 <?php
 
+require_once 'Process.class.php';
+
 class Stream {
 	
 	private $id;
@@ -9,10 +11,19 @@ class Stream {
 	
 	public static $sqlite_filename = 'data.sqlite';
 	public static $table_name = 'streams';
+	public static $pid_filename = 'webtransco.pid';
 	
 	
 	public function get_viewers() {
 		return $this->viewers;
+	}
+	
+	public function add_viewer() {
+		$this->viewers ++;
+	}
+	
+	public function remove_viewer() {
+		$this->viewers --;
 	}
 	
 	
@@ -42,18 +53,14 @@ class Stream {
 //	 		echo $create_sql; die;
 			Stream::$db->exec($create_sql);
 			
-			// insert test data
-			$insert_sql = "
-				INSERT INTO ".Stream::$table_name." ( viewers )
-				VALUES ( 0 )";
-//	 		echo $insert_sql; die;
-			Stream::$db->exec($insert_sql);
-//	 		$id = Stream::$db->lastInsertId();
+			// insert test data //TODO remove later
+			$s = new Stream();
+			$s->save();
 		}
 	}
 	
 	
-	public static function get_the_stream($id) {
+	public static function find_stream($id) {
 		$select = "
 			SELECT *
 			FROM ".Stream::$table_name."
@@ -63,59 +70,119 @@ class Stream {
 		$stmt->setFetchMode(PDO::FETCH_ASSOC);
 		$row = $stmt->fetch();
 // 		echo "<pre>", var_dump($row); echo "</pre>";
-		$res = new Stream($row['id'], $row['viewers']);
+		$res = new Stream();
+		$res->fill_with_array($row);
 		return $res;
 	}
 	
-	public function __construct($id, $viewers) {
-		$this->id = (int)$id;
-		$this->viewers = (int)$viewers;
+	
+	private function fill_with_array($a) {
+		if(isset($a['id']))
+			$this->id = (int)$a['id'];
+		else
+			$this->id = null;
+		
+		if(isset($a['viewers']))
+			$this->viewers = (int)$a['viewers'];
+		else
+			$this->viewers = 0;
 	}
 	
 	
-	public static function start($id) {
+	public function __construct() {
+		$this->id = null;
+		$this->viewers = 0;
+	}
+	
+	
+	public function save() {
+		$id = isset($this->id) ? $this->id : 'NULL';
+		$sql = "
+			INSERT OR REPLACE INTO ".Stream::$table_name." ( id, viewers )
+			VALUES ( ".$id.", ".$this->viewers." )
+		";
+// 		echo $sql; die;
+		Stream::$db->exec($sql);
+	 	$this->id = Stream::$db->lastInsertId();
+	}
+	
+	
+	public function start() {
 		$sql = "BEGIN TRANSACTION";		
 		Stream::$db->exec($sql);
 		
-		$stream = Stream::get_the_stream($id);
+		$stream = Stream::find_stream($this->id);
 // 		var_dump($stream); die;
 		if($stream->get_viewers() === 0) { // only if needed
-			StartStop::start();
+			Stream::start_process();
 		}
 		
-		$update_sql = "
-			UPDATE ".Stream::$table_name."
-			SET viewers = " . ($stream->get_viewers() + 1) . "
-			WHERE id = ".$id."
-		";
-// 	 	echo $update_sql; die;
-		Stream::$db->exec($update_sql);
+		$stream->viewers ++;
+		$stream->save();
 		
 		$sql = "END TRANSACTION";
 		Stream::$db->exec($sql);
 	}
 	
 	
-	public static function stop($id) {
+	public function stop() {
 		$sql = "BEGIN TRANSACTION";
 		Stream::$db->exec($sql);
 	
-		$stream = Stream::get_the_stream($id);
+		$stream = Stream::find_stream($this->id);
 // 		var_dump($stream); die;
 		if($stream->get_viewers() === 1) { // only if needed
-			StartStop::stop();
+			Stream::stop_process();
 		}
 	
-		$update_sql = "
-			UPDATE ".Stream::$table_name."
-			SET viewers = " . ($stream->get_viewers() - 1) . "
-			WHERE id = ".$id."
-		";
-//	 	echo $update_sql; die;
-		Stream::$db->exec($update_sql);
+		$stream->viewers --;
+		$stream->save();
 	
 		$sql = "END TRANSACTION";
 		Stream::$db->exec($sql);
 	}
 	
+	
+	private static function start_process() {
+		if(! file_exists(Stream::$pid_filename)) {
+			$command = "cvlc -vvv http://hd.stream.frequence3.net/frequence3.flac --sout '#transcode{vcodec=none,acodec=vorb,ab=256} :standard{access=http,mux=ogg,dst=:8000/}'";
+			$p = new Process($command);
+	
+			$fo = fopen(Stream::$pid_filename, 'w');
+			fwrite($fo, $p->getPid());
+			fclose($fo);
+		}
+		else {
+			die("already running");
+		}
+	}
+	
+	
+	private static function stop_process() {
+		if(file_exists(Stream::$pid_filename)) {
+			$fo = fopen(Stream::$pid_filename, 'r');
+			$pid = fgets($fo);
+			fclose($fo);
+	
+			$p = new Process();
+			$p->setPid($pid);
+			$ret = $p->stop();
+	
+			unlink(Stream::$pid_filename);
+		}
+		else {
+			die("not running");
+		}
+	}
+	
 }
+
+
+
+
+// Stream::prepare_db();
+// $s = new Stream();
+// $s->save();
+// $s->add_viewer();
+// $s->save();
+

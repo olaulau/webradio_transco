@@ -12,11 +12,11 @@ fait :
 - lancer et quitter le VLC transcodeur avec un script CLI
 => ok avec une ligne comme celle-ci :
 cvlc -vvv http://hd.stream.frequence3.net/frequence3.flac --sout '#transcode{acodec=vorb,ab=256} :standard{access=http,mux=ogg,dst=:8000/}'
-
+- intégrer ca dans un wrapper PHP, avec compteur de listener
+=> ok
 
 
 à faire :
-- intégrer ca dans un wrapper PHP, avec compteur de listener
 - interface web pour tout ca ?
 
 
