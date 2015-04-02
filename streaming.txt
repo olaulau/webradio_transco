@@ -17,7 +17,20 @@ cvlc -vvv http://hd.stream.frequence3.net/frequence3.flac --sout '#transcode{aco
 
 
 à faire :
+- plus d'infos en base, ajouter :
+	original_url : http://hd.stream.frequence3.net/frequence3.flac
+	acodec : vorb
+	ab : 256
+	mux : ogg
+	dest_port : 8000
+	pid
+	peak_viewers
+	total_viewers
 - interface web pour tout ca ?
+- détecter présence cvlc, sujgérer d'installer vlc-nox
+- essayer avec FFmpeg / libav pour permettre l'encodage en AAC
+	https://trac.ffmpeg.org/wiki/StreamingGuide
+- ajouter/répliquer header pour lecture directe dans le navigateur
 
 
 notes :
