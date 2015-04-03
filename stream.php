@@ -32,8 +32,14 @@ while(!test_http()) {
 }
 
 
+// send headers, so that it can be viewed directly in the browser with a plugin
+header('Content-type: application/octet-stream');
+header('Cache-Control: no-cache');
+
+
 // start streaming
 $handle = fopen("http://localhost:8000/", "rb");
+// echo "<pre>"; print_r($http_response_header); echo "</pre>"; die;
 if (FALSE === $handle) {
 	exit("Echec lors de l'ouverture du flux vers l'URL");
 }

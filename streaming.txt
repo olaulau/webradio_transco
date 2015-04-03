@@ -3,17 +3,19 @@ apache + php + vlc
 
 fait :
 - 2 connections vers 1 serveur HTTP inclu dans la diffusion VLC :
-=> 1 seul flux original : ca rempli donc le rôle de icecast
+	=> 1 seul flux original : ca rempli donc le rôle de icecast
 - vérifier qu'un client comme VLC suit bien les redirections HTTP (302)
 	sinon il faudra faire un reverse proxy HTTP avec apache
-=> marche ! suffit d'un .htaccess avec un truc comme ca dedans :
-	RewriteEngine On
-	RewriteRule ^(.*)$ http://localhost:8000/ [R=301,L]
+	=> marche ! suffit d'un .htaccess avec un truc comme ca dedans :
+		RewriteEngine On
+		RewriteRule ^(.*)$ http://localhost:8000/ [R=301,L]
 - lancer et quitter le VLC transcodeur avec un script CLI
-=> ok avec une ligne comme celle-ci :
-cvlc -vvv http://hd.stream.frequence3.net/frequence3.flac --sout '#transcode{acodec=vorb,ab=256} :standard{access=http,mux=ogg,dst=:8000/}'
+	=> ok avec une ligne comme celle-ci :
+	cvlc -vvv http://hd.stream.frequence3.net/frequence3.flac --sout '#transcode{acodec=vorb,ab=256} :standard{access=http,mux=ogg,dst=:8000/}'
 - intégrer ca dans un wrapper PHP, avec compteur de listener
-=> ok
+	=> ok
+- ajouter headers pour lecture directe dans le navigateur
+	=> ok
 
 
 à faire :
@@ -27,10 +29,9 @@ cvlc -vvv http://hd.stream.frequence3.net/frequence3.flac --sout '#transcode{aco
 	peak_viewers
 	total_viewers
 - interface web pour tout ca ?
-- détecter présence cvlc, sujgérer d'installer vlc-nox
+- détecter présence cvlc, suggérer d'installer vlc-nox
 - essayer avec FFmpeg / libav pour permettre l'encodage en AAC
 	https://trac.ffmpeg.org/wiki/StreamingGuide
-- ajouter/répliquer header pour lecture directe dans le navigateur
 
 
 notes :
