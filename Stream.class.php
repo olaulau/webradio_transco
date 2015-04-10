@@ -20,7 +20,6 @@ class Stream {
 	
 	public static $sqlite_filename = 'data.sqlite';
 	public static $table_name = 'streams';
-	public static $pid_filename = 'webtransco.pid';
 	
 	
 	public function get_actual_viewers() {
@@ -98,8 +97,8 @@ class Stream {
 					acodec TEXT NOT NULL,
 					ab INTEGER NOT NULL,
 					mux TEXT NOT NULL,
-					dest_port INTEGER NOT NULL,
-					pid INTEGER NOT NULL
+					dest_port INTEGER,
+					pid INTEGER
 				)";
 //	 		echo $create_sql; die;
 			Stream::$db->exec($create_sql);
@@ -124,7 +123,7 @@ class Stream {
 	}
 	
 	
-	public static function find_stream($id) {
+	public static function find_stream($id, $dest=null) {
 		$select = "
 			SELECT *
 			FROM ".Stream::$table_name."
@@ -134,9 +133,16 @@ class Stream {
 		$stmt->setFetchMode(PDO::FETCH_ASSOC);
 		$row = $stmt->fetch();
 // 		echo "<pre>", var_dump($row); echo "</pre>";
-		$res = new Stream();
+		if(isset($dest))
+			$res = &$dest;
+		else
+			$res = new Stream();
 		$res->fill_with_array($row);
 		return $res;
+	}
+	
+	public function refresh() {
+		Stream::find_stream($this->id, $this);
 	}
 	
 	private static function affect_nullable_int($value, &$var) {
@@ -158,7 +164,7 @@ class Stream {
 			$var = '';
 	}
 	private function fill_with_array($a) {
-		Stream::affect_nullable_int($a['id'], $this->id);
+		Stream::affect_nullable_int($a['id'], $this->id); // null in case of creation
 		Stream::affect_int($a['actual_viewers'], $this->actual_viewers);
 		Stream::affect_int($a['peak_viewers'], $this->peak_viewers);
 		Stream::affect_int($a['total_viewers'], $this->total_viewers);
@@ -166,8 +172,8 @@ class Stream {
 		Stream::affect_str($a['acodec'], $this->acodec);
 		Stream::affect_int($a['ab'], $this->ab);
 		Stream::affect_str($a['mux'], $this->mux);
-		Stream::affect_int($a['dest_port'], $this->dest_port);
-		Stream::affect_int($a['pid'], $this->pid);
+		Stream::affect_nullable_int($a['dest_port'], $this->dest_port);
+		Stream::affect_nullable_int($a['pid'], $this->pid);
 	}
 	
 	
@@ -176,9 +182,13 @@ class Stream {
 		$this->actual_viewers = 0;
 	}
 	
-	
+	private static function sql_nullable($val) {
+		return isset($val) ? $val : 'NULL';
+	}
 	public function save() {
-		$id = isset($this->id) ? $this->id : 'NULL';
+		$id = Stream::sql_nullable($this->id);
+		$dest_port = Stream::sql_nullable($this->dest_port);
+		$pid = Stream::sql_nullable($this->pid);
 		$sql = "
 			INSERT OR REPLACE INTO ".Stream::$table_name."
 				( id, actual_viewers, peak_viewers, total_viewers, original_url, acodec, ab, mux, dest_port, pid )
@@ -191,8 +201,8 @@ class Stream {
 				"'".$this->acodec."', ".
 				$this->ab.", ".
 				"'".$this->mux."', ".
-				$this->dest_port.", ".
-				$this->pid
+				$dest_port.", ".
+				$pid
 			." )";
 // 		echo $sql; die;
 		Stream::$db->exec($sql);
@@ -200,53 +210,49 @@ class Stream {
 	 		$this->id = Stream::$db->lastInsertId();
 	}
 	
-	
-	public function start() {
-		$sql = "BEGIN TRANSACTION";		
+	public static function begin_transaction() {
+		$sql = "BEGIN TRANSACTION";
 		Stream::$db->exec($sql);
-		
-		$stream = Stream::find_stream($this->id);
-// 		var_dump($stream); die;
-		if($stream->get_actual_viewers() === 0) { // only if needed
-			$this->start_process();
-		}
-		
-		$stream->add_viewer();
-		$stream->save();
-		
+	}
+	public static function end_transaction() {
 		$sql = "END TRANSACTION";
 		Stream::$db->exec($sql);
 	}
 	
+	public function start() {
+		Stream::begin_transaction();
+		$this->refresh();
+// 		var_dump($this); die;
+		if($this->get_actual_viewers() === 0) { // only if needed
+			$this->start_process();
+		}
+		$this->add_viewer();
+		$this->save();
+		Stream::end_transaction();
+	}
+	
 	
 	public function stop() {
-		$sql = "BEGIN TRANSACTION";
-		Stream::$db->exec($sql);
-	
-		$stream = Stream::find_stream($this->id);
-// 		var_dump($stream); die;
-		if($stream->get_actual_viewers() === 1) { // only if needed
+		Stream::begin_transaction();
+		$this->refresh();
+// 		var_dump($this); die;
+		if($this->get_actual_viewers() === 1) { // only if needed
 			$this->stop_process();
 		}
-	
-		$stream->remove_viewer();
-		$stream->save();
-	
-		$sql = "END TRANSACTION";
-		Stream::$db->exec($sql);
+		$this->remove_viewer();
+		$this->save();
+		Stream::end_transaction();
 	}
 	
 	
 	private function start_process() {
 		global $conf;
-		if(! file_exists(Stream::$pid_filename)) {
+		if(!isset($this->pid)) {
 			$command = $conf['vlc_executable'] . " -vvv " . $this->original_url . " --sout '#transcode{vcodec=none,acodec=" . $this->acodec . ",ab=" . $this->ab . "} :standard{access=http,mux=" . $this->mux . ",dst=:" . $this->dest_port . "/}'";
 // 			echo "launching : $command"; die;
 			$p = new Process($command);
-	
-			$fo = fopen(Stream::$pid_filename, 'w');
-			fwrite($fo, $p->getPid());
-			fclose($fo);
+			$this->pid = $p->getPid();
+			$this->save();
 		}
 		else {
 			die("already running");
@@ -255,16 +261,12 @@ class Stream {
 	
 	
 	private function stop_process() {
-		if(file_exists(Stream::$pid_filename)) {
-			$fo = fopen(Stream::$pid_filename, 'r');
-			$pid = fgets($fo);
-			fclose($fo);
-	
+		if(isset($this->pid)) {
 			$p = new Process();
-			$p->setPid($pid);
+			$p->setPid($this->get_pid());
 			$ret = $p->stop();
-	
-			unlink(Stream::$pid_filename);
+			$this->pid = null;
+			$this->save();
 		}
 		else {
 			die("not running");
