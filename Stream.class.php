@@ -2,6 +2,7 @@
 
 require_once 'Process.class.php';
 require_once 'config.inc.php';
+// require_once 'MyPDO.class.php';
 
 class Stream {
 	
@@ -71,7 +72,7 @@ class Stream {
 		// check db object created
 		if(!isset(Stream::$db)) {
 // 			echo nl2br("connecting to sqlite db" . PHP_EOL);
-			Stream::$db = new PDO('sqlite:' . Stream::$sqlite_filename);
+			Stream::$db = new /*My*/PDO('sqlite:' . Stream::$sqlite_filename); //TODO MyPDO -> PDO
 			Stream::$db->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 		}
 		
@@ -109,12 +110,12 @@ class Stream {
 				'actual_viewers' => 0,
 				'peak_viewers' => 0,
 				'total_viewers' => 0,
-				'original_url' => 'http://hd.stream.frequence3.net/frequence3.flac',
+				'original_url' => 'http://hd.stream.frequence3.net/frequence3-256.mp3',
 				'acodec' => 'vorb',
-				'ab' => 256,
+				'ab' => 192,
 				'mux' => 'ogg',
-				'dest_port' => 8000,
-				'pid' => null
+				'dest_port' => NULL,
+				'pid' => NULL
 			);
 			$s = new Stream();
 			$s->fill_with_array($row);
@@ -204,7 +205,8 @@ class Stream {
 				$dest_port.", ".
 				$pid
 			." )";
-// 		echo $sql; die;
+// 		echo "<pre>"; echo $sql; echo "</pre>"; die
+		
 		Stream::$db->exec($sql);
 		if(!isset($this->id))
 	 		$this->id = Stream::$db->lastInsertId();
@@ -245,13 +247,48 @@ class Stream {
 	}
 	
 	
+	private static function dest_port() {
+		global $conf;
+		$select = "
+			SELECT COUNT(*) AS nb
+			FROM ".Stream::$table_name."
+			WHERE dest_port IS NOT NULL
+		";
+		$stmt = Stream::$db->query($select);
+		$stmt->setFetchMode(PDO::FETCH_ASSOC);
+		$row = $stmt->fetch();
+// 		echo "NB=".$row['nb']; die;
+		if($row['nb'] > 0) {
+			$select = "
+				SELECT max(dest_port) AS dest_port
+				FROM ".Stream::$table_name."
+			";
+			$stmt = Stream::$db->query($select);
+			$stmt->setFetchMode(PDO::FETCH_ASSOC);
+			$row = $stmt->fetch();
+			$dest_port = (int)$row['dest_port'] + 1;
+			if($dest_port <= $conf['max_dest_port'])
+				return $dest_port;
+			else
+				die("all port have been allocated.");
+		}
+		else {
+			return $conf['min_dest_port'];
+		}
+		
+		
+		
+	} 
 	private function start_process() {
 		global $conf;
 		if(!isset($this->pid)) {
-			$command = $conf['vlc_executable'] . " -vvv " . $this->original_url . " --sout '#transcode{vcodec=none,acodec=" . $this->acodec . ",ab=" . $this->ab . "} :standard{access=http,mux=" . $this->mux . ",dst=:" . $this->dest_port . "/}'";
+			$dest_port = Stream::dest_port();
+// 			echo $dest_port; die;
+			$command = $conf['vlc_executable'] . " -vvv " . $this->original_url . " --sout '#transcode{vcodec=none,acodec=" . $this->acodec . ",ab=" . $this->ab . "} :standard{access=http,mux=" . $this->mux . ",dst=:" . $dest_port . "/}'";
 // 			echo "launching : $command"; die;
 			$p = new Process($command);
 			$this->pid = $p->getPid();
+			$this->dest_port = $dest_port;
 			$this->save();
 		}
 		else {
@@ -265,12 +302,19 @@ class Stream {
 			$p = new Process();
 			$p->setPid($this->get_pid());
 			$ret = $p->stop();
+			$this->dest_port = null;
 			$this->pid = null;
 			$this->save();
 		}
 		else {
 			die("not running");
 		}
+	}
+	
+	
+	public function test_http() {
+		$connection = @fsockopen("localhost", $this->dest_port);
+		return is_resource($connection);
 	}
 	
 }
