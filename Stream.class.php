@@ -23,10 +23,13 @@ class Stream {
 	public static $table_name = 'streams';
 	
 	
+	public function get_id() {
+		return $this->id;
+	}
+	
 	public function get_actual_viewers() {
 		return $this->actual_viewers;
 	}
-	
 	public function add_viewer() {
 		$this->actual_viewers ++;
 		if($this->actual_viewers > $this->peak_viewers)
@@ -34,7 +37,6 @@ class Stream {
 		$this->total_viewers ++;
 		
 	}
-	
 	public function remove_viewer() {
 		$this->actual_viewers --;
 	}
@@ -42,7 +44,6 @@ class Stream {
 	public function get_peak_viewers() {
 		return $this->peak_viewers;
 	}
-	
 	public function get_total_viewers() {
 		return $this->total_viewers;
 	}
@@ -125,12 +126,13 @@ class Stream {
 	
 	
 	public static function find_stream($id, $dest=null) {
-		$select = "
-			SELECT *
-			FROM ".Stream::$table_name."
-			WHERE id = ".$id."
+		$sql = "
+			SELECT	*
+			FROM	".Stream::$table_name."
+			WHERE	id = ".$id."
 		";
-		$stmt = Stream::$db->query($select);
+// 		echo $sql; die;
+		$stmt = Stream::$db->query($sql);
 		$stmt->setFetchMode(PDO::FETCH_ASSOC);
 		$row = $stmt->fetch();
 // 		echo "<pre>", var_dump($row); echo "</pre>";
@@ -138,12 +140,32 @@ class Stream {
 			$res = &$dest;
 		else
 			$res = new Stream();
-		$res->fill_with_array($row);
+		if($row === FALSE)
+			$res = NULL;
+		else
+			$res->fill_with_array($row);
 		return $res;
 	}
 	
 	public function refresh() {
+// 		echo "<pre>"; print_r($this); echo "</pre>"; die;
 		Stream::find_stream($this->id, $this);
+	}
+	
+	public static function get_all() {
+		$select = "
+			SELECT	*
+			FROM	".Stream::$table_name."
+		";
+		$stmt = Stream::$db->query($select);
+		$stmt->setFetchMode(PDO::FETCH_ASSOC);
+		$res = array();
+		foreach ($stmt as $row) {
+			$s = new Stream();
+			$s->fill_with_array($row);
+			$res[] = $s;
+		}
+		return $res;
 	}
 	
 	private static function affect_nullable_int($value, &$var) {
