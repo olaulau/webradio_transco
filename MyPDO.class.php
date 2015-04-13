@@ -1,6 +1,6 @@
 <?php
 
-require_once 'log4php/Logger.php';
+require_once 'external/log4php/Logger.php';
 
 class MyPDO extends PDO {
 	

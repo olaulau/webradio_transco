@@ -76,7 +76,9 @@ class Stream {
 			Stream::$db = new /*My*/PDO('sqlite:' . Stream::$sqlite_filename); //TODO MyPDO -> PDO
 			Stream::$db->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 		}
-		
+	}
+	
+	public static function create_structure() {
 		// check db table created
 		$table_select = "
 			SELECT	count(*)
@@ -86,9 +88,9 @@ class Stream {
 			COLLATE	NOCASE
 		";
 		$stmt = Stream::$db->query($table_select);
-// 		var_dump($stmt->fetchColumn()); die;
+		// 		var_dump($stmt->fetchColumn()); die;
 		if($stmt->fetchColumn() != 1) {
-// 			echo nl2br("creating table" . PHP_EOL);
+			// 			echo nl2br("creating table" . PHP_EOL);
 			$create_sql = "
 				CREATE TABLE ".Stream::$table_name."(
 					id INTEGER PRIMARY KEY,
@@ -102,26 +104,30 @@ class Stream {
 					dest_port INTEGER,
 					pid INTEGER
 				)";
-//	 		echo $create_sql; die;
+			//	 		echo $create_sql; die;
 			Stream::$db->exec($create_sql);
-			
-			// insert test data //TODO remove later
-			$row = array(
-				'id' => 1,
-				'actual_viewers' => 0,
-				'peak_viewers' => 0,
-				'total_viewers' => 0,
-				'original_url' => 'http://hd.stream.frequence3.net/frequence3-256.mp3',
-				'acodec' => 'vorb',
-				'ab' => 192,
-				'mux' => 'ogg',
-				'dest_port' => NULL,
-				'pid' => NULL
-			);
-			$s = new Stream();
-			$s->fill_with_array($row);
-			$s->save();
+				
+			Stream::insert_test_data(); //TODO remove later
 		}
+	}
+	
+	public static function insert_test_data() {
+		// insert test data
+		$row = array(
+		'id' => NULL,
+		'actual_viewers' => 0,
+		'peak_viewers' => 0,
+		'total_viewers' => 0,
+		'original_url' => 'http://hd.stream.frequence3.net/frequence3-256.mp3',
+		'acodec' => 'vorb',
+		'ab' => 192,
+		'mux' => 'ogg',
+		'dest_port' => NULL,
+		'pid' => NULL
+		);
+		$s = new Stream();
+		$s->fill_with_array($row);
+		$s->save();
 	}
 	
 	

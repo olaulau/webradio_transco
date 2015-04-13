@@ -28,7 +28,7 @@ if(!empty($_GET['id'])) {
 		$stream = Stream::find_stream($id);
 		if(isset($stream)) {
 			$stream->start();
-
+			set_time_limit(0);
 			
 			// wait for the HTTP server to respond
 			while(!$stream->test_http()) {
