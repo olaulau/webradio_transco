@@ -75,11 +75,33 @@ if(!empty($_SESSION['messages'])) {
 		<table class="table table-bordered table-hover">
 			<thead>
 				<tr>
-					<th>#</th>
-					<th>Original URL</th>
-					<th>transcoded format</th>
-					<th>lien</th>
-					<?php if(Admin::is_admin()) {?> <th>actions</th> <?php } ?>
+					<th rowspan=2>#</th>
+					<th rowspan=2>Name</th>
+					<th colspan=3>listeners</th>
+					<?php
+					if(Admin::is_admin()) {
+						?>
+						<th rowspan=2>Original URL</th>
+						<th colspan=2>internal VLC server</th>
+						<?php
+					}
+					?>
+					<th rowspan=2>transcoded format</th>
+					<th rowspan=2>lien</th>
+					<?php if(Admin::is_admin()) {?> <th rowspan=2>actions</th> <?php } ?>
+				</tr>
+				<tr>
+					<th>actual</th>
+					<th>peak</th>
+					<th>total</th>
+					<?php
+					if(Admin::is_admin()) {
+						?>
+						<th>HTTP port</th>
+						<th>PID</th>
+						<?php
+					}
+					?>
 				</tr>
 			</thead>
 			<tbody>
@@ -90,8 +112,20 @@ foreach ( $streams as $s ) {
 	?>
 	<tr>
 		<td><?=$s->get_id()?></td>
-		<td><?=$s->get_original_url()?></td>
-		<td><?=' [' . $s->get_mux() . ' ' . $s->get_acodec() . ' ' . $s->get_ab() . 'kbps]'?></td>
+		<td><?=$s->get_name()?></td>
+		<td><?=$s->get_actual_viewers()?></td>
+		<td><?=$s->get_peak_viewers()?></td>
+		<td><?=$s->get_total_viewers()?></td>
+		<?php
+		if(Admin::is_admin()) {
+			?>
+			<td><?=$s->get_original_url()?></td>
+			<td><?=$s->get_dest_port()?></td>
+			<td><?=$s->get_pid()?></td>
+			<?php
+		}
+		?>
+		<td><?=$s->get_mux() . ' ' . $s->get_acodec() . ' ' . $s->get_ab() . ' kbps'?></td>
 		<td><a href="stream.php?id=<?= $s->get_id()?>">GO</a></td>
 		<?php
 		if(Admin::is_admin()) {

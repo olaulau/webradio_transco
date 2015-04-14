@@ -34,39 +34,42 @@ Admin::restrict();
 </head>
 <body>
 
-<div class="container">
-	<h1>Add a stream</h1>
-	<form action="add.post.php" method="post">
-	  <div class="form-group form-group-lg">
-	    <label for="original_url">Original URL</label>
-	    <input type="text" class="form-control" id="original_url" name="original_url" placeholder="original URL" required>
-	  </div>
-	  
-	  <div class="form-group form-group-lg">
-	    <label for="acodec">Audio codec</label>
-	    <select class="form-control" id="acodec" name="acodec" required>
-	    	<option value="" disabled selected>audio codec</option>
-		  	<option value="vorb">vorg</option>
-		</select>
-	  </div>
-	  
-	   <div class="form-group form-group-lg">
-	    <label for="ab">Audio bitrate</label>
-	    <input type="number" class="form-control" id="ab" name="ab" placeholder="audio bitrate" min="32" max="320" required>
-	  </div>
-	  
-	  <div class="form-group form-group-lg">
-	    <label for="mux">Mux</label>
-	    <select class="form-control" id="mux" name="mux" required>
-	    	<option value=""disabled selected>mux</option>
-		  	<option value="ogg">ogg</option>
-		</select>
-	  </div>
+	<div class="container">
+		<h1>Add a stream</h1>
+		<form action="add.post.php" method="post">
+			<div class="form-group form-group-lg">
+				<label for="name">Name</label> <input type="name" class="form-control" id="name"
+					name="name" placeholder="Name" required>
+			</div>
 
-	  <button type="submit" class="btn btn-lg btn-default">Add</button>
-	</form>
-</div>
+			<div class="form-group form-group-lg">
+				<label for="original_url">Original URL</label> <input type="text" class="form-control" id="original_url"
+					name="original_url" placeholder="original URL" required>
+			</div>
+
+			<div class="form-group form-group-lg">
+				<label for="acodec">Audio codec</label> <select class="form-control" id="acodec" name="acodec" required>
+					<option value="" disabled selected>audio codec</option>
+					<option value="vorb">vorg</option>
+				</select>
+			</div>
+
+			<div class="form-group form-group-lg">
+				<label for="ab">Audio bitrate</label> <input type="number" class="form-control" id="ab" name="ab"
+					placeholder="audio bitrate" min="32" max="320" required>
+			</div>
+
+			<div class="form-group form-group-lg">
+				<label for="mux">Mux</label> <select class="form-control" id="mux" name="mux" required>
+					<option value="" disabled selected>mux</option>
+					<option value="ogg">ogg</option>
+				</select>
+			</div>
+
+			<button type="submit" class="btn btn-lg btn-default">Add</button>
+		</form>
+	</div>
 
 
-  </body>
+</body>
 </html>

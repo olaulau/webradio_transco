@@ -8,6 +8,7 @@ class Stream {
 	
 	/// attributes ///
 	private $id;
+	private $name;
 	private $actual_viewers;
 	private $peak_viewers;
 	private $total_viewers;
@@ -28,12 +29,16 @@ class Stream {
 	/// constructor ///
 	public function __construct() {
 		$this->id = null;
-		$this->actual_viewers = 0;
+		$this->actual_viewers = 0; //TODO usefull ?
 	}
 	
 	/// getters and setters ///
 	public function get_id() {
 		return $this->id;
+	}
+	
+	public function get_name() {
+		return $this->name;
 	}
 	
 	public function get_actual_viewers() {
@@ -104,6 +109,7 @@ class Stream {
 			$create_sql = "
 				CREATE TABLE ".Stream::$table_name."(
 					id INTEGER PRIMARY KEY,
+					name TEXT NOT NULL,
 					actual_viewers INTEGER NOT NULL DEFAULT 0,
 					peak_viewers INTEGER NOT NULL DEFAULT 0,
 					total_viewers INTEGER NOT NULL DEFAULT 0,
@@ -127,6 +133,7 @@ class Stream {
 		// insert test data
 		$row = array(
 			'id' => NULL,
+			'name' => 'fréquence 3',
 			'actual_viewers' => 0,
 			'peak_viewers' => 0,
 			'total_viewers' => 0,
@@ -257,6 +264,7 @@ class Stream {
 	
 	public  function fill_with_array($a) {
 		Stream::affect_nullable_int((isset($a['id'])?$a['id']:NULL), $this->id); // null in case of creation
+		Stream::affect_str((isset($a['name'])?$a['name']:NULL), $this->name);
 		Stream::affect_int((isset($a['actual_viewers'])?$a['actual_viewers']:NULL), $this->actual_viewers);
 		Stream::affect_int((isset($a['peak_viewers'])?$a['peak_viewers']:NULL), $this->peak_viewers);
 		Stream::affect_int((isset($a['total_viewers'])?$a['total_viewers']:NULL), $this->total_viewers);
@@ -275,9 +283,10 @@ class Stream {
 		$pid = Stream::sql_nullable($this->pid);
 		$sql = "
 			INSERT OR REPLACE INTO ".Stream::$table_name."
-				( id, actual_viewers, peak_viewers, total_viewers, original_url, acodec, ab, mux, dest_port, pid )
+				( id, name, actual_viewers, peak_viewers, total_viewers, original_url, acodec, ab, mux, dest_port, pid )
 			VALUES ( ".
 				$id.", ".
+				"'".$this->name."', ".
 				$this->actual_viewers.", ".
 				$this->peak_viewers.", ".
 				$this->total_viewers.", ".
