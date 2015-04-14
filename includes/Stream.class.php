@@ -126,16 +126,16 @@ class Stream {
 	public static function insert_test_data() {
 		// insert test data
 		$row = array(
-		'id' => NULL,
-		'actual_viewers' => 0,
-		'peak_viewers' => 0,
-		'total_viewers' => 0,
-		'original_url' => 'http://hd.stream.frequence3.net/frequence3-256.mp3',
-		'acodec' => 'vorb',
-		'ab' => 192,
-		'mux' => 'ogg',
-		'dest_port' => NULL,
-		'pid' => NULL
+			'id' => NULL,
+			'actual_viewers' => 0,
+			'peak_viewers' => 0,
+			'total_viewers' => 0,
+			'original_url' => 'http://hd.stream.frequence3.net/frequence3-256.mp3',
+			'acodec' => 'vorb',
+			'ab' => 192,
+			'mux' => 'ogg',
+			'dest_port' => NULL,
+			'pid' => NULL
 		);
 		$s = new Stream();
 		$s->fill_with_array($row);
@@ -255,17 +255,17 @@ class Stream {
 	}
 	
 	
-	private function fill_with_array($a) {
-		Stream::affect_nullable_int($a['id'], $this->id); // null in case of creation
-		Stream::affect_int($a['actual_viewers'], $this->actual_viewers);
-		Stream::affect_int($a['peak_viewers'], $this->peak_viewers);
-		Stream::affect_int($a['total_viewers'], $this->total_viewers);
-		Stream::affect_str($a['original_url'], $this->original_url);
-		Stream::affect_str($a['acodec'], $this->acodec);
-		Stream::affect_int($a['ab'], $this->ab);
-		Stream::affect_str($a['mux'], $this->mux);
-		Stream::affect_nullable_int($a['dest_port'], $this->dest_port);
-		Stream::affect_nullable_int($a['pid'], $this->pid);
+	public  function fill_with_array($a) {
+		Stream::affect_nullable_int((isset($a['id'])?$a['id']:NULL), $this->id); // null in case of creation
+		Stream::affect_int((isset($a['actual_viewers'])?$a['actual_viewers']:NULL), $this->actual_viewers);
+		Stream::affect_int((isset($a['peak_viewers'])?$a['peak_viewers']:NULL), $this->peak_viewers);
+		Stream::affect_int((isset($a['total_viewers'])?$a['total_viewers']:NULL), $this->total_viewers);
+		Stream::affect_str((isset($a['original_url'])?$a['original_url']:NULL), $this->original_url);
+		Stream::affect_str((isset($a['acodec'])?$a['acodec']:NULL), $this->acodec);
+		Stream::affect_int((isset($a['ab'])?$a['ab']:NULL), $this->ab);
+		Stream::affect_str((isset($a['mux'])?$a['mux']:NULL), $this->mux);
+		Stream::affect_nullable_int((isset($a['dest_port'])?$a['dest_port']:NULL), $this->dest_port);
+		Stream::affect_nullable_int((isset($a['pid'])?$a['pid']:NULL), $this->pid);
 	}
 	
 	
