@@ -1,5 +1,7 @@
 <?php
 session_start();
+
+require_once __DIR__.'/admin/admin.class.php';
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -24,10 +26,29 @@ session_start();
 <script src="external/jquery.min.js"></script>
 <!-- Include all compiled plugins (below), or include individual files as needed -->
 <script src="external/bootstrap/js/bootstrap.min.js"></script>
+
+<script src="index.js"></script>
 </head>
 <body>
+
+<div class="container" role="main">
+<?php
+if(!empty($_SESSION['messages'])) {
+	foreach ($_SESSION['messages'] as $message) {
+		?>
+		<div class="alert alert-success " role="alert">
+			<?=$message?>
+		</div>
+		<?php
+	}
+	unset($_SESSION['messages']);
+}
+?>
+</div>
+
+
 	<?php
-	if(isset($_SESSION['admin']) && $_SESSION['admin'] === TRUE) {
+	if(Admin::is_admin()) {
 		?>
 		<a href="admin/auth/signout.php"><button type="button" class="btn btn-lg btn-primary pull-right">Log out</button></a>
 		<?php
