@@ -1,3 +1,8 @@
+<?php
+session_start();
+if(isset($_SESSION['admin']) && $_SESSION['admin'] === TRUE)
+	echo "ADMIN <br/>";
+?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
