@@ -8,7 +8,7 @@ $conf['vlc_executable'] = '/usr/bin/cvlc';									// for a standart installatio
 $conf['min_dest_port'] = 8000;
 $conf['max_dest_port'] = 8999;
 
-// admin users, see passwd.php to hash your passwords
+// admin users, open admin/auth/passwd.php to create a password hash
 $conf['admins'] = array(
 		'admin' => '$2y$10$FXt/US/dtgFQQYrqXCEEn.qOrB9F8GoVDW/Ymy7PDmr91/TyP1IS6'
 );

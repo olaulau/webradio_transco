@@ -11,7 +11,7 @@
     <title>Signin Template for Bootstrap</title>
 
     <!-- Bootstrap core CSS -->
-    <link href="external/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+    <link href="../../external/bootstrap/css/bootstrap.min.css" rel="stylesheet">
 
     <!-- Custom styles for this template -->
     <link href="signin.css" rel="stylesheet">
@@ -28,18 +28,16 @@
   </head>
 
   <body>
-
+	<a href="passwd.php"><button type="button" class="btn btn-lg btn-primary pull-right">generate password hash</button></a>
+	
     <div class="container">
 
-      <form class="form-signin" action="passwd.php" method="post">
-        <h2 class="form-signin-heading">Enter your pasword</h2>
-<!--         <label for="password" class="sr-only">Password</label> -->
+      <form class="form-signin" action="signin.post.php" method="post">
+        <h2 class="form-signin-heading">Please sign in</h2>
+        <label for="login" class="sr-only">Login</label>
+        <input type="text" id="login" name="login" class="form-control" placeholder="Login" required autofocus>
+        <label for="password" class="sr-only">Password</label>
         <input type="password" id="password" name="password" class="form-control" placeholder="Password" required>
-        <?php
-		if(!empty($_POST['password'])) {
-			echo password_hash($_POST['password'], PASSWORD_BCRYPT);
-		}
-		?>
 <!--         <div class="checkbox"> -->
 <!--           <label> -->
 <!--             <input type="checkbox" value="remember-me"> Remember me -->

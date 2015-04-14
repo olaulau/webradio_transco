@@ -28,6 +28,7 @@ if(isset($_SESSION['admin']) && $_SESSION['admin'] === TRUE)
 <script src="external/bootstrap/js/bootstrap.min.js"></script>
 </head>
 <body>
+	<a href="admin/auth/signin.php"><button type="button" class="btn btn-lg btn-primary pull-right">Log in</button></a>
 	<h1>Webradio Transco</h1>
 
 
@@ -44,7 +45,7 @@ if(isset($_SESSION['admin']) && $_SESSION['admin'] === TRUE)
 			<tbody>
 
 <?php
-require_once 'Stream.class.php';
+require_once __DIR__.'/includes/Stream.class.php';
 
 // DB
 Stream::prepare_db ();

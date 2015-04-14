@@ -1,6 +1,6 @@
 <?php
 
-require_once 'Stream.class.php';
+require_once __DIR__.'/includes/Stream.class.php';
 
 if(!empty($_GET['id'])) {
 	$id = $_GET['id'];

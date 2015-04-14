@@ -1,8 +1,8 @@
 <?php
 
-require_once 'Process.class.php';
-require_once 'config.inc.php';
-// require_once 'MyPDO.class.php';
+require_once __DIR__.'/../external/Process.class.php';
+require_once __DIR__.'/config.inc.php';
+// require_once __DIR__.'/MyPDO.class.php';
 
 class Stream {
 	
