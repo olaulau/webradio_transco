@@ -1,7 +1,5 @@
 <?php
 session_start();
-if(isset($_SESSION['admin']) && $_SESSION['admin'] === TRUE)
-	echo "ADMIN <br/>";
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -28,7 +26,19 @@ if(isset($_SESSION['admin']) && $_SESSION['admin'] === TRUE)
 <script src="external/bootstrap/js/bootstrap.min.js"></script>
 </head>
 <body>
-	<a href="admin/auth/signin.php"><button type="button" class="btn btn-lg btn-primary pull-right">Log in</button></a>
+	<?php
+	if(isset($_SESSION['admin']) && $_SESSION['admin'] === TRUE) {
+		?>
+		<a href="admin/auth/signout.php"><button type="button" class="btn btn-lg btn-primary pull-right">Log out</button></a>
+		<?php
+	}
+	else {
+		?>
+		<a href="admin/auth/signin.php"><button type="button" class="btn btn-lg btn-primary pull-right">Log in</button></a>
+		<?php
+	}
+	?>
+	
 	<h1>Webradio Transco</h1>
 
 
