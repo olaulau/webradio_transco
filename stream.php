@@ -60,11 +60,9 @@ if(!empty($_GET['id'])) {
 		
 	}
 	else {
-		// id is not a positive integer
 		die("id is not a positive integer");
 	}
 }
 else {
-	// no stream id specified
 	die("no stream id specified");
 }

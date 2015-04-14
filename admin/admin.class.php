@@ -8,7 +8,7 @@ class Admin {
 	
 	public static function restrict() {
 		if(!Admin::is_admin()) {
-			header('Location: '.$_SERVER['HTTP_REFERER']);
+			header('Location: '.'auth/signin.php');
 		}
 	}
 }

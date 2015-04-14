@@ -6,6 +6,7 @@ require_once __DIR__.'/config.inc.php';
 
 class Stream {
 	
+	/// attributes ///
 	private $id;
 	private $actual_viewers;
 	private $peak_viewers;
@@ -19,10 +20,18 @@ class Stream {
 	
 	private static $db;
 	
-	public static $sqlite_filename = 'data.sqlite';
+	/// constants ///
+	public static function sqlite_filename() { return __DIR__.'/../data.sqlite'; }
 	public static $table_name = 'streams';
 	
 	
+	/// constructor ///
+	public function __construct() {
+		$this->id = null;
+		$this->actual_viewers = 0;
+	}
+	
+	/// getters and setters ///
 	public function get_id() {
 		return $this->id;
 	}
@@ -67,13 +76,14 @@ class Stream {
 	public function get_pid() {
 		return $this->pid;
 	}
-
 	
+	
+	/// static functions ///
 	public static function prepare_db() {
 		// check db object created
 		if(!isset(Stream::$db)) {
 // 			echo nl2br("connecting to sqlite db" . PHP_EOL);
-			Stream::$db = new /*My*/PDO('sqlite:' . Stream::$sqlite_filename); //TODO MyPDO -> PDO
+			Stream::$db = new /*My*/PDO('sqlite:' . Stream::sqlite_filename()); //TODO MyPDO -> PDO ?
 			Stream::$db->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 		}
 	}
@@ -88,9 +98,9 @@ class Stream {
 			COLLATE	NOCASE
 		";
 		$stmt = Stream::$db->query($table_select);
-		// 		var_dump($stmt->fetchColumn()); die;
+// 		var_dump($stmt->fetchColumn()); die;
 		if($stmt->fetchColumn() != 1) {
-			// 			echo nl2br("creating table" . PHP_EOL);
+// 			echo nl2br("creating table" . PHP_EOL);
 			$create_sql = "
 				CREATE TABLE ".Stream::$table_name."(
 					id INTEGER PRIMARY KEY,
@@ -104,10 +114,12 @@ class Stream {
 					dest_port INTEGER,
 					pid INTEGER
 				)";
-			//	 		echo $create_sql; die;
+// 	 		echo $create_sql; die;
 			Stream::$db->exec($create_sql);
+			$_SESSION['messages'][] = 'created data structure';
 				
 			Stream::insert_test_data(); //TODO remove later
+			$_SESSION['messages'][] = 'inserted test data';
 		}
 	}
 	
@@ -153,10 +165,6 @@ class Stream {
 		return $res;
 	}
 	
-	public function refresh() {
-// 		echo "<pre>"; print_r($this); echo "</pre>"; die;
-		Stream::find_stream($this->id, $this);
-	}
 	
 	public static function get_all() {
 		$select = "
@@ -192,6 +200,61 @@ class Stream {
 		else
 			$var = '';
 	}
+	
+	
+	private static function sql_nullable($val) {
+		return isset($val) ? $val : 'NULL';
+	}
+	
+	
+	public static function begin_transaction() {
+		$sql = "BEGIN TRANSACTION";
+		Stream::$db->exec($sql);
+	}
+	public static function end_transaction() {
+		$sql = "END TRANSACTION";
+		Stream::$db->exec($sql);
+	}
+	
+	
+	private static function dest_port() {
+		global $conf;
+		$select = "
+			SELECT COUNT(*) AS nb
+			FROM ".Stream::$table_name."
+			WHERE dest_port IS NOT NULL
+		";
+		$stmt = Stream::$db->query($select);
+		$stmt->setFetchMode(PDO::FETCH_ASSOC);
+		$row = $stmt->fetch();
+		// 		echo "NB=".$row['nb']; die;
+		if($row['nb'] > 0) {
+			$select = "
+				SELECT max(dest_port) AS dest_port
+				FROM ".Stream::$table_name."
+			";
+			$stmt = Stream::$db->query($select);
+			$stmt->setFetchMode(PDO::FETCH_ASSOC);
+			$row = $stmt->fetch();
+			$dest_port = (int)$row['dest_port'] + 1;
+			if($dest_port <= $conf['max_dest_port'])
+				return $dest_port;
+			else
+				die("all port have been allocated.");
+		}
+		else {
+			return $conf['min_dest_port'];
+		}
+	}
+	
+	
+	/// methods ///
+	public function refresh() {
+// 		echo "<pre>"; print_r($this); echo "</pre>"; die;
+		Stream::find_stream($this->id, $this);
+	}
+	
+	
 	private function fill_with_array($a) {
 		Stream::affect_nullable_int($a['id'], $this->id); // null in case of creation
 		Stream::affect_int($a['actual_viewers'], $this->actual_viewers);
@@ -206,14 +269,6 @@ class Stream {
 	}
 	
 	
-	public function __construct() {
-		$this->id = null;
-		$this->actual_viewers = 0;
-	}
-	
-	private static function sql_nullable($val) {
-		return isset($val) ? $val : 'NULL';
-	}
 	public function save() {
 		$id = Stream::sql_nullable($this->id);
 		$dest_port = Stream::sql_nullable($this->dest_port);
@@ -240,14 +295,15 @@ class Stream {
 	 		$this->id = Stream::$db->lastInsertId();
 	}
 	
-	public static function begin_transaction() {
-		$sql = "BEGIN TRANSACTION";
+	
+	public function remove() {
+		$sql = "
+			DELETE FROM ".Stream::$table_name."
+			WHERE	id = " . $this->id;
+// 		echo "<pre>"; echo $sql; echo "</pre>"; die
 		Stream::$db->exec($sql);
 	}
-	public static function end_transaction() {
-		$sql = "END TRANSACTION";
-		Stream::$db->exec($sql);
-	}
+	
 	
 	public function start() {
 		Stream::begin_transaction();
@@ -274,39 +330,7 @@ class Stream {
 		Stream::end_transaction();
 	}
 	
-	
-	private static function dest_port() {
-		global $conf;
-		$select = "
-			SELECT COUNT(*) AS nb
-			FROM ".Stream::$table_name."
-			WHERE dest_port IS NOT NULL
-		";
-		$stmt = Stream::$db->query($select);
-		$stmt->setFetchMode(PDO::FETCH_ASSOC);
-		$row = $stmt->fetch();
-// 		echo "NB=".$row['nb']; die;
-		if($row['nb'] > 0) {
-			$select = "
-				SELECT max(dest_port) AS dest_port
-				FROM ".Stream::$table_name."
-			";
-			$stmt = Stream::$db->query($select);
-			$stmt->setFetchMode(PDO::FETCH_ASSOC);
-			$row = $stmt->fetch();
-			$dest_port = (int)$row['dest_port'] + 1;
-			if($dest_port <= $conf['max_dest_port'])
-				return $dest_port;
-			else
-				die("all port have been allocated.");
-		}
-		else {
-			return $conf['min_dest_port'];
-		}
-		
-		
-		
-	} 
+ 
 	private function start_process() {
 		global $conf;
 		if(!isset($this->pid)) {
@@ -349,7 +373,7 @@ class Stream {
 
 
 
-
+/// test ///
 // Stream::prepare_db();
 // $s = new Stream();
 // $s->save();

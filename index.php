@@ -2,6 +2,11 @@
 session_start();
 
 require_once __DIR__.'/admin/admin.class.php';
+require_once __DIR__.'/includes/Stream.class.php';
+
+// DB
+Stream::prepare_db ();
+Stream::create_structure ();
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -71,17 +76,12 @@ if(!empty($_SESSION['messages'])) {
 					<th>Original URL</th>
 					<th>transcoded format</th>
 					<th>lien</th>
+					<th>actions</th>
 				</tr>
 			</thead>
 			<tbody>
 
 <?php
-require_once __DIR__.'/includes/Stream.class.php';
-
-// DB
-Stream::prepare_db ();
-Stream::create_structure ();
-
 $streams = Stream::get_all ();
 foreach ( $streams as $s ) {
 	?>
@@ -90,6 +90,7 @@ foreach ( $streams as $s ) {
 		<td><?=$s->get_original_url()?></td>
 		<td><?=' [' . $s->get_mux() . ' ' . $s->get_acodec() . ' ' . $s->get_ab() . 'kbps]'?></td>
 		<td><a href="stream.php?id=<?= $s->get_id()?>">GO</a></td>
+		<td><a href="admin/delete.php?id=<?= $s->get_id()?>"><span class="glyphicon glyphicon-remove" aria-hidden="true" title="remove"></span></a></td>
 	</tr>
 	<?php
 }
