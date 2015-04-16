@@ -1,3 +1,6 @@
+<?php
+require_once __DIR__.'/../../external/password.php';
+?>
 <!DOCTYPE html>
 <html lang="en">
   <head>
