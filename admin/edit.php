@@ -2,6 +2,7 @@
 session_start();
 
 require_once __DIR__.'/../includes/Stream.class.php';
+require_once __DIR__.'/../includes/VLC_capabilities.class.php';
 require_once __DIR__.'/admin.class.php';
 
 Admin::restrict();
@@ -60,8 +61,13 @@ if(!empty($_GET['id'])) {
 
 			<div class="form-group form-group-lg">
 				<label for="acodec">Audio codec</label> <select class="form-control" id="acodec" name="acodec" required>
-					<option value="" disabled>audio codec</option>
-					<option value="vorb" selected>vorg</option>
+				<option value="" disabled>audio codec</option>
+				<?php
+				foreach (VLC_capabilities::$acodecs as $acodec => $label) {
+					$selected = $stream->get_acodec() == $acodec ? 'selected' : '';
+					echo '<option value="'.$acodec.'" '.$selected.'>'.$label.'</option>' . PHP_EOL;
+				}
+				?>
 				</select>
 			</div>
 
@@ -73,7 +79,12 @@ if(!empty($_GET['id'])) {
 			<div class="form-group form-group-lg">
 				<label for="mux">Mux</label> <select class="form-control" id="mux" name="mux" required>
 					<option value="" disabled selected>mux</option>
-					<option value="ogg" selected>ogg</option>
+					<?php
+					foreach (VLC_capabilities::$muxers as $mux => $label) {
+						$selected = $stream->get_mux() == $mux ? 'selected' : '';
+						echo '<option value="'.$mux.'" '.$selected.'>'.$label.'</option>' . PHP_EOL;
+					}
+					?>
 				</select>
 			</div>
 
