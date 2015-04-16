@@ -20,9 +20,13 @@ fait :
 	=> ok
 - attribution dynamique du dest_port
 	=> ok
+- interface web
+	=> OK
 
 à faire :
-- interface web pour tout ca ?
+- contraintes sur les possibilités acodec / mux avec VLC
+- possibilité de ne pas transcoder (simple streaming), nécessaire au restreaming interne
+- restreaming interne (un seul flux entrant, plusieurs flux sortants proposés (encodage différents par exemple)
 - détecter présence cvlc, suggérer d'installer vlc-nox
 - essayer avec FFmpeg / libav pour permettre l'encodage en AAC
 	https://trac.ffmpeg.org/wiki/StreamingGuide

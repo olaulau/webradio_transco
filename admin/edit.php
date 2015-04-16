@@ -71,7 +71,10 @@ else {
 
 			<div class="form-group form-group-lg">
 				<label for="acodec">Audio codec</label> <select class="form-control" id="acodec" name="acodec" required>
-				<?php $selected = (empty($stream->get_acodec())) ? 'selected' : ''; ?>
+				<?php
+				$acodec = $stream->get_acodec();
+				$selected = (empty($acodec)) ? 'selected' : '';
+				?>
 				<option value="" disabled <?=$selected?>>audio codec</option>
 				<?php
 				foreach (VLC_capabilities::$acodecs as $acodec => $label) {
@@ -89,7 +92,10 @@ else {
 
 			<div class="form-group form-group-lg">
 				<label for="mux">Mux</label> <select class="form-control" id="mux" name="mux" required>
-					<?php $selected = (empty($stream->get_acodec())) ? 'selected' : ''; ?>
+					<?php
+					$mux = $stream->get_mux();
+					$selected = (empty($mux)) ? 'selected' : '';
+					?>
 					<option value="" disabled <?=$selected?>>mux</option>
 					<?php
 					foreach (VLC_capabilities::$muxers as $mux => $label) {

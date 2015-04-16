@@ -3,6 +3,11 @@ needed for ubuntu 12.04, into which VLC may fail to transcode
 no solution with FFmpeg/libav war which lacks FFserver, which could have been an alternative to VLC
 
 
+### VLC version
+use 2.1.6 for ubuntu 12.04, the last which compiles without any dependancy problem.  
+on recent distro, you can compile more recent (2.2.x) version this way, but you should use the one provided in your repository.
+
+
 ### prepare your system (root commands)
 add deb-src lines to your source.list  
 - apt-get update  
