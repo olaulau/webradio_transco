@@ -19,7 +19,8 @@ class Process {
         }
     }
     private function runCom(){
-        $command = 'nohup '.$this->command.' > /dev/null 2>&1 & echo $!';
+        $command = '/usr/bin/nohup '.$this->command.' > /dev/null 2>&1 & echo $!';
+//         echo "launching : $command"; die;
         exec($command ,$op);
         $this->pid = (int)$op[0];
     }
