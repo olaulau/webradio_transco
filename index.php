@@ -132,6 +132,7 @@ foreach ( $streams as $s ) {
 		?>
 			<td>
 				<a href="admin/delete.php?id=<?= $s->get_id()?>"><span class="glyphicon glyphicon-remove" aria-hidden="true" title="remove"></span></a>
+				<a href="admin/edit.php?id=<?= $s->get_id()?>"><span class="glyphicon glyphicon-edit" aria-hidden="true"></span></span></a>
 			</td>
 		<?php
 		}	
@@ -143,6 +144,16 @@ foreach ( $streams as $s ) {
 			</tbody>
 		</table>
 	</div>
-	<?php if(Admin::is_admin()) {?> <a href="admin/add.php"><span class="glyphicon glyphicon-plus" aria-hidden="true" title="add"></span></a> <?php } ?>
+	<?php
+	if(Admin::is_admin()) {
+		?>
+		<a href="admin/add.php">
+		<button type="button" class="btn btn-primary btn-lg">
+			<span class="glyphicon glyphicon-plus" aria-hidden="true"></span> Add
+		</button>
+		</a>
+		<?php
+	}
+	?>
   </body>
 </html>

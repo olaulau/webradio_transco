@@ -1,9 +1,18 @@
 <?php
 session_start();
 
+require_once __DIR__.'/../includes/Stream.class.php';
 require_once __DIR__.'/admin.class.php';
 
 Admin::restrict();
+
+if(!empty($_GET['id'])) {
+	$id = $_GET['id'];
+	if(ctype_digit($id) && $id > 0) {
+		$id = (int)$id;
+		Stream::prepare_db();
+		$stream = Stream::find_stream($id);
+		if(isset($stream)) {
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -36,33 +45,35 @@ Admin::restrict();
 
 	<div class="container">
 		<h1>Add a stream</h1>
-		<form action="add.post.php" method="post">
+		<form action="edit.post.php" method="post">
+			<input type="hidden" name="id" id="id" value="<?= $stream->get_id() ?>" />
+		
 			<div class="form-group form-group-lg">
 				<label for="name">Name</label> <input type="text" class="form-control" id="name"
-					name="name" placeholder="Name" required>
+					name="name" placeholder="Name" value="<?= $stream->get_name() ?>" required>
 			</div>
 
 			<div class="form-group form-group-lg">
 				<label for="original_url">Original URL</label> <input type="text" class="form-control" id="original_url"
-					name="original_url" placeholder="original URL" required>
+					name="original_url" placeholder="original URL" value="<?= $stream->get_original_url() ?>" required>
 			</div>
 
 			<div class="form-group form-group-lg">
 				<label for="acodec">Audio codec</label> <select class="form-control" id="acodec" name="acodec" required>
-					<option value="" disabled selected>audio codec</option>
-					<option value="vorb">vorg</option>
+					<option value="" disabled>audio codec</option>
+					<option value="vorb" selected>vorg</option>
 				</select>
 			</div>
 
 			<div class="form-group form-group-lg">
 				<label for="ab">Audio bitrate</label> <input type="number" class="form-control" id="ab" name="ab"
-					placeholder="audio bitrate" min="32" max="320" required>
+					placeholder="audio bitrate" min="32" max="320" value="<?= $stream->get_ab() ?>" required>
 			</div>
 
 			<div class="form-group form-group-lg">
 				<label for="mux">Mux</label> <select class="form-control" id="mux" name="mux" required>
 					<option value="" disabled selected>mux</option>
-					<option value="ogg">ogg</option>
+					<option value="ogg" selected>ogg</option>
 				</select>
 			</div>
 
@@ -70,6 +81,18 @@ Admin::restrict();
 		</form>
 	</div>
 
-
 </body>
 </html>
+<?php
+		}
+		else {
+			die("id doesn't exist");
+		}
+	}
+	else {
+		die("id is not a positive integer");
+	}
+}
+else {
+	die("no stream id specified");
+}
