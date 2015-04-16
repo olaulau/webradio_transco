@@ -7,11 +7,11 @@ require_once __DIR__.'/config.inc.php';
 class Stream {
 	
 	/// attributes ///
-	private $id;
+	private $id = null;
 	private $name;
-	private $actual_viewers;
-	private $peak_viewers;
-	private $total_viewers;
+	private $actual_viewers = 0;
+	private $peak_viewers = 0;
+	private $total_viewers = 0;
 	private $original_url;
 	private $acodec;
 	private $ab;
@@ -28,8 +28,7 @@ class Stream {
 	
 	/// constructor ///
 	public function __construct() {
-		$this->id = null;
-		$this->actual_viewers = 0; //TODO usefull ?
+		
 	}
 	
 	/// getters and setters ///
@@ -263,17 +262,28 @@ class Stream {
 	
 	
 	public  function fill_with_array($a) {
-		Stream::affect_nullable_int((isset($a['id'])?$a['id']:NULL), $this->id); // null in case of creation
-		Stream::affect_str((isset($a['name'])?$a['name']:NULL), $this->name);
-		Stream::affect_int((isset($a['actual_viewers'])?$a['actual_viewers']:NULL), $this->actual_viewers);
-		Stream::affect_int((isset($a['peak_viewers'])?$a['peak_viewers']:NULL), $this->peak_viewers);
-		Stream::affect_int((isset($a['total_viewers'])?$a['total_viewers']:NULL), $this->total_viewers);
-		Stream::affect_str((isset($a['original_url'])?$a['original_url']:NULL), $this->original_url);
-		Stream::affect_str((isset($a['acodec'])?$a['acodec']:NULL), $this->acodec);
-		Stream::affect_int((isset($a['ab'])?$a['ab']:NULL), $this->ab);
-		Stream::affect_str((isset($a['mux'])?$a['mux']:NULL), $this->mux);
-		Stream::affect_nullable_int((isset($a['dest_port'])?$a['dest_port']:NULL), $this->dest_port);
-		Stream::affect_nullable_int((isset($a['pid'])?$a['pid']:NULL), $this->pid);
+		if(isset($a['id']))
+			Stream::affect_nullable_int((isset($a['id'])?$a['id']:NULL), $this->id); // null in case of creation
+		if(isset($a['name']))
+			Stream::affect_str((isset($a['name'])?$a['name']:NULL), $this->name);
+		if(isset($a['actual_viewers']))
+			Stream::affect_int((isset($a['actual_viewers'])?$a['actual_viewers']:NULL), $this->actual_viewers);
+		if(isset($a['peak_viewers']))
+			Stream::affect_int((isset($a['peak_viewers'])?$a['peak_viewers']:NULL), $this->peak_viewers);
+		if(isset($a['total_viewers']))
+			Stream::affect_int((isset($a['total_viewers'])?$a['total_viewers']:NULL), $this->total_viewers);
+		if(isset($a['original_url']))
+			Stream::affect_str((isset($a['original_url'])?$a['original_url']:NULL), $this->original_url);
+		if(isset($a['acodec']))
+			Stream::affect_str((isset($a['acodec'])?$a['acodec']:NULL), $this->acodec);
+		if(isset($a['ab']))
+			Stream::affect_int((isset($a['ab'])?$a['ab']:NULL), $this->ab);
+		if(isset($a['mux']))
+			Stream::affect_str((isset($a['mux'])?$a['mux']:NULL), $this->mux);
+		if(isset($a['dest_port']))
+			Stream::affect_nullable_int((isset($a['dest_port'])?$a['dest_port']:NULL), $this->dest_port);
+		if(isset($a['pid']))
+			Stream::affect_nullable_int((isset($a['pid'])?$a['pid']:NULL), $this->pid);
 	}
 	
 	
@@ -297,7 +307,7 @@ class Stream {
 				$dest_port.", ".
 				$pid
 			." )";
-// 		echo "<pre>"; echo $sql; echo "</pre>"; die
+// 		echo "<pre>"; echo $sql; echo "</pre>"; die;
 		
 		Stream::$db->exec($sql);
 		if(!isset($this->id))

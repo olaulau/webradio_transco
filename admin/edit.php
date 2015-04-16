@@ -13,7 +13,17 @@ if(!empty($_GET['id'])) {
 		$id = (int)$id;
 		Stream::prepare_db();
 		$stream = Stream::find_stream($id);
-		if(isset($stream)) {
+		if(!isset($stream)) {
+			die("id doesn't exist");
+		}
+	}
+	else {
+		die("id is not a positive integer");
+	}
+}
+else {
+	$stream = new Stream();
+}
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -45,7 +55,7 @@ if(!empty($_GET['id'])) {
 <body>
 
 	<div class="container">
-		<h1>Add a stream</h1>
+		<h1><?= isset($id) ? 'Edit' : 'Add' ?> a stream</h1>
 		<form action="edit.post.php" method="post">
 			<input type="hidden" name="id" id="id" value="<?= $stream->get_id() ?>" />
 		
@@ -61,7 +71,8 @@ if(!empty($_GET['id'])) {
 
 			<div class="form-group form-group-lg">
 				<label for="acodec">Audio codec</label> <select class="form-control" id="acodec" name="acodec" required>
-				<option value="" disabled>audio codec</option>
+				<?php $selected = (empty($stream->get_acodec())) ? 'selected' : ''; ?>
+				<option value="" disabled <?=$selected?>>audio codec</option>
 				<?php
 				foreach (VLC_capabilities::$acodecs as $acodec => $label) {
 					$selected = $stream->get_acodec() == $acodec ? 'selected' : '';
@@ -78,7 +89,8 @@ if(!empty($_GET['id'])) {
 
 			<div class="form-group form-group-lg">
 				<label for="mux">Mux</label> <select class="form-control" id="mux" name="mux" required>
-					<option value="" disabled selected>mux</option>
+					<?php $selected = (empty($stream->get_acodec())) ? 'selected' : ''; ?>
+					<option value="" disabled <?=$selected?>>mux</option>
 					<?php
 					foreach (VLC_capabilities::$muxers as $mux => $label) {
 						$selected = $stream->get_mux() == $mux ? 'selected' : '';
@@ -88,22 +100,9 @@ if(!empty($_GET['id'])) {
 				</select>
 			</div>
 
-			<button type="submit" class="btn btn-lg btn-default">Add</button>
+			<button type="submit" class="btn btn-lg btn-default">Save</button>
 		</form>
 	</div>
 
 </body>
 </html>
-<?php
-		}
-		else {
-			die("id doesn't exist");
-		}
-	}
-	else {
-		die("id is not a positive integer");
-	}
-}
-else {
-	die("no stream id specified");
-}
