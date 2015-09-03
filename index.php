@@ -133,8 +133,9 @@ foreach ( $streams as $s ) {
 		if(Admin::is_admin()) {
 		?>
 			<td>
-				<a href="admin/delete.php?id=<?= $s->get_id()?>"><span class="glyphicon glyphicon-remove" aria-hidden="true" title="remove"></span></a>
+				<a href="admin/force_stop.php?id=<?= $s->get_id()?>" alt="force stop" ><span class="glyphicon glyphicon-off" aria-hidden="true"></span></a>
 				<a href="admin/edit.php?id=<?= $s->get_id()?>"><span class="glyphicon glyphicon-edit" aria-hidden="true"></span></a>
+				<a href="admin/delete.php?id=<?= $s->get_id()?>"><span class="glyphicon glyphicon-remove" aria-hidden="true" title="remove"></span></a>
 			</td>
 		<?php
 		}	

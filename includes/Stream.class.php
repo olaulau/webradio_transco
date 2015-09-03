@@ -383,6 +383,17 @@ class Stream {
 	}
 	
 	
+	public function force_stop() {
+		Stream::begin_transaction();
+		$this->refresh();
+		// 		var_dump($this); die;
+		$this->actual_viewers = 0;
+		$this->save();
+		Stream::end_transaction();
+		$this->stop_process();
+	}
+	
+	
 	public function test_http() {
 		$connection = @fsockopen("localhost", $this->dest_port);
 		return is_resource($connection);
