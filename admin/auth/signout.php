@@ -1,5 +1,5 @@
 <?php
-session_start();
+require_once __DIR__.'/../../includes/ALL.inc.php';
 
 unset($_SESSION['admin']);
 $_SESSION['messages'][] = 'successfully signed out';

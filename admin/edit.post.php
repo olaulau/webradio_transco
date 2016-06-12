@@ -1,8 +1,5 @@
 <?php
-session_start();
-
-require_once __DIR__.'/../includes/config.inc.php';
-require_once __DIR__.'/../includes/Stream.class.php';
+require_once __DIR__.'/../includes/ALL.inc.php';
 
 // print_r($_POST); die;
 if(!empty($_POST['name']) && !empty($_POST['original_url']) && !empty($_POST['acodec']) && !empty($_POST['ab']) && !empty($_POST['mux'])) {

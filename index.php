@@ -1,8 +1,5 @@
 <?php
-session_start();
-
-require_once __DIR__.'/admin/admin.class.php';
-require_once __DIR__.'/includes/Stream.class.php';
+require_once __DIR__.'/includes/ALL.inc.php';
 
 // DB
 Stream::prepare_db ();

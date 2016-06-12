@@ -1,8 +1,5 @@
 <?php
-session_start();
-
-require_once __DIR__.'/admin.class.php';
-require_once __DIR__.'/../includes/Stream.class.php';
+require_once __DIR__.'/../includes/ALL.inc.php';
 
 Admin::restrict();
 

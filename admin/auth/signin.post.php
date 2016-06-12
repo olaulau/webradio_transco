@@ -1,8 +1,6 @@
 <?php
-session_start();
-
+require_once __DIR__.'/../../includes/ALL.inc.php';
 require_once __DIR__.'/../../external/password.php';
-require_once __DIR__.'/../../includes/config.inc.php';
 
 // print_r($_POST); die;
 if(!empty($_POST['login']) && !empty($_POST['password'])) {
