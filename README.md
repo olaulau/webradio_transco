@@ -8,14 +8,14 @@ on-demand webradio transcoding platform
 - on-the-fly transcode : you can change container / codec / bitrate of the stream
 
 
-##status
+## status
 working great, specially with ogg/vorbis output.
 
 
 ## installation
 install debian / ubuntu package vlc-nox  
 if you're on ubuntu 12.04, see [instruction to compile VLC](vlc_compile.md)   
-git clone https://github.com/olaulau/webradio_transco  
-modify and rename includes/config_EXAMPLE.inc.php  
-(default admin password is passwd, you can generate a new one with this page : /admin/auth/passwd.php  
-the first time you go to index.php, it will create the database and a test Stream.  
+```git clone https://github.com/olaulau/webradio_transco```  
+modify and rename ```includes/config_EXAMPLE.inc.php```  
+(default admin password is ```passwd```, you can generate a new one with this page : ```/admin/auth/passwd.php```  
+the first time you go to ```index.php```, it will create the database and a test Stream.  
