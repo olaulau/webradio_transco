@@ -34,18 +34,16 @@ if(!empty($_GET['id'])) {
 				usleep(100*1000); // 0.1s
 			}
 			
-			
-			// send headers, so that it can be viewed directly in the browser with a plugin
-			header('Content-type: application/octet-stream');
-			header('Cache-Control: no-cache');
-			
-			
 			// start streaming
 			$handle = fopen("http://localhost:" . $stream->get_dest_port() . "/", "rb");
 			// echo "<pre>"; print_r($http_response_header); echo "</pre>"; die;
 			if (FALSE === $handle) {
 				exit("Echec lors de l'ouverture du flux");
 			}
+
+			// send headers, so that it can be viewed directly in the browser with a plugin
+			header('Content-type: application/octet-stream');
+			header('Cache-Control: no-cache');
 			
 			while (!feof($handle)) {
 				$buffer = fread($handle, 8192);

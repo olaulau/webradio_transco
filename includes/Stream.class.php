@@ -1,10 +1,11 @@
 <?php
 
-require_once __DIR__.'/../external/Process.class.php';
-require_once __DIR__.'/config.inc.php';
+require_once __DIR__ . '/../external/Process.class.php';
+require_once __DIR__ . '/config.inc.php';
 // require_once __DIR__.'/MyPDO.class.php';
 
-class Stream {
+class Stream
+{
 	
 	/// attributes ///
 	private $id = null;
@@ -22,25 +23,32 @@ class Stream {
 	private static $db;
 	
 	/// constants ///
-	public static function sqlite_filename() { return __DIR__.'/../data.sqlite'; }
+	public static function sqlite_filename()
+	{
+		return __DIR__.'/../data.sqlite';
+	}
 	public static $table_name = 'streams';
 	
 	
 	/// constructor ///
-	public function __construct() {
+	public function __construct()
+	{
 		
 	}
 	
 	/// getters and setters ///
-	public function get_id() {
+	public function get_id()
+	{
 		return $this->id;
 	}
 	
-	public function get_name() {
+	public function get_name()
+	{
 		return $this->name;
 	}
 	
-	public function get_actual_viewers() {
+	public function get_actual_viewers()
+	{
 		return $this->actual_viewers;
 	}
 	public function add_viewer() {
@@ -50,40 +58,50 @@ class Stream {
 		$this->total_viewers ++;
 		
 	}
-	public function remove_viewer() {
+	public function remove_viewer()
+	{
 		$this->actual_viewers --;
 	}
 	
-	public function get_peak_viewers() {
+	public function get_peak_viewers()
+	{
 		return $this->peak_viewers;
 	}
-	public function get_total_viewers() {
+	public function get_total_viewers()
+	{
 		return $this->total_viewers;
 	}
 	
-	public function get_original_url() {
+	public function get_original_url()
+	{
 		return $this->original_url;
 	}
 	
-	public function get_acodec() {
+	public function get_acodec()
+	{
 		return $this->acodec;
 	}
-	public function get_ab() {
+	public function get_ab()
+	{
 		return $this->ab;
 	}
-	public function get_mux() {
+	public function get_mux()
+	{
 		return $this->mux;
 	}
-	public function get_dest_port() {
+	public function get_dest_port()
+	{
 		return $this->dest_port;
 	}
-	public function get_pid() {
+	public function get_pid()
+	{
 		return $this->pid;
 	}
 	
 	
 	/// static functions ///
-	public static function prepare_db() {
+	public static function prepare_db()
+	{
 		// check db object created
 		if(!isset(Stream::$db)) {
 // 			echo nl2br("connecting to sqlite db" . PHP_EOL);
@@ -92,7 +110,8 @@ class Stream {
 		}
 	}
 	
-	public static function create_structure() {
+	public static function create_structure()
+	{
 		// check db table created
 		$table_select = "
 			SELECT	count(*)
@@ -128,7 +147,8 @@ class Stream {
 		}
 	}
 	
-	public static function insert_test_data() {
+	public static function insert_test_data()
+	{
 		// insert test data
 		$row = array(
 			'id' => NULL,
@@ -149,7 +169,8 @@ class Stream {
 	}
 	
 	
-	public static function find_stream($id, $dest=null) {
+	public static function find_stream($id, $dest=null) : ?self
+	{
 		$sql = "
 			SELECT	*
 			FROM	".Stream::$table_name."
@@ -160,19 +181,23 @@ class Stream {
 		$stmt->setFetchMode(PDO::FETCH_ASSOC);
 		$row = $stmt->fetch();
 // 		echo "<pre>", var_dump($row); echo "</pre>";
+
 		if(isset($dest))
 			$res = &$dest;
 		else
 			$res = new Stream();
+
 		if($row === FALSE)
 			$res = NULL;
 		else
 			$res->fill_with_array($row);
+
 		return $res;
 	}
 	
 	
-	public static function get_all() {
+	public static function get_all()
+	{
 		$select = "
 			SELECT	*
 			FROM	".Stream::$table_name."
@@ -188,19 +213,22 @@ class Stream {
 		return $res;
 	}
 	
-	private static function affect_nullable_int($value, &$var) {
+	private static function affect_nullable_int($value, &$var)
+	{
 		if(isset($value))
 			$var = (int)$value;
 		else
 			$var = null;
 	}
-	private static function affect_int($value, &$var) {
+	private static function affect_int($value, &$var)
+	{
 		if(isset($value))
 			$var = (int)$value;
 		else
 			$var = 0;
 	}
-	private static function affect_str($value, &$var) {
+	private static function affect_str($value, &$var)
+	{
 		if(isset($value))
 			$var = $value;
 		else
@@ -208,22 +236,26 @@ class Stream {
 	}
 	
 	
-	private static function sql_nullable($val) {
+	private static function sql_nullable($val)
+	{
 		return isset($val) ? $val : 'NULL';
 	}
 	
 	
-	public static function begin_transaction() {
+	public static function begin_transaction()
+	{
 		$sql = "BEGIN TRANSACTION";
 		Stream::$db->exec($sql);
 	}
-	public static function end_transaction() {
+	public static function end_transaction()
+	{
 		$sql = "END TRANSACTION";
 		Stream::$db->exec($sql);
 	}
 	
 	
-	private static function dest_port() {
+	private static function dest_port()
+	{
 		global $conf;
 		$select = "
 			SELECT COUNT(*) AS nb
@@ -255,13 +287,15 @@ class Stream {
 	
 	
 	/// methods ///
-	public function refresh() {
+	public function refresh()
+	{
 // 		echo "<pre>"; print_r($this); echo "</pre>"; die;
 		Stream::find_stream($this->id, $this);
 	}
 	
 	
-	public  function fill_with_array($a) {
+	public function fill_with_array($a)
+	{
 		if(isset($a['id']))
 			Stream::affect_nullable_int((isset($a['id'])?$a['id']:NULL), $this->id); // null in case of creation
 		if(isset($a['name']))
@@ -287,7 +321,8 @@ class Stream {
 	}
 	
 	
-	public function save() {
+	public function save()
+	{
 		$id = Stream::sql_nullable($this->id);
 		$dest_port = Stream::sql_nullable($this->dest_port);
 		$pid = Stream::sql_nullable($this->pid);
@@ -315,7 +350,8 @@ class Stream {
 	}
 	
 	
-	public function remove() {
+	public function remove()
+	{
 		$sql = "
 			DELETE FROM ".Stream::$table_name."
 			WHERE	id = " . $this->id;
@@ -324,7 +360,8 @@ class Stream {
 	}
 	
 	
-	public function start() {
+	public function start()
+	{
 		Stream::begin_transaction();
 		$this->refresh();
 // 		var_dump($this); die;
@@ -337,7 +374,8 @@ class Stream {
 	}
 	
 	
-	public function stop() {
+	public function stop()
+	{
 		Stream::begin_transaction();
 		$this->refresh();
 // 		var_dump($this); die;
@@ -350,7 +388,8 @@ class Stream {
 	}
 	
  
-	private function start_process() {
+	private function start_process()
+	{
 		global $conf;
 		if(!isset($this->pid)) {
 			$dest_port = Stream::dest_port();
@@ -368,7 +407,8 @@ class Stream {
 	}
 	
 	
-	private function stop_process() {
+	private function stop_process()
+	{
 		if(isset($this->pid)) {
 			$p = new Process();
 			$p->setPid($this->get_pid());
@@ -383,7 +423,8 @@ class Stream {
 	}
 	
 	
-	public function force_stop() {
+	public function force_stop()
+	{
 		Stream::begin_transaction();
 		$this->refresh();
 		// 		var_dump($this); die;
@@ -394,13 +435,13 @@ class Stream {
 	}
 	
 	
-	public function test_http() {
+	public function test_http()
+	{
 		$connection = @fsockopen("localhost", $this->dest_port);
 		return is_resource($connection);
 	}
 	
 }
-
 
 
 /// test ///
@@ -409,4 +450,3 @@ class Stream {
 // $s->save();
 // $s->add_viewer();
 // $s->save();
-
