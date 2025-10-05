@@ -12,6 +12,13 @@ on-demand webradio transcoding platform
 working great, specially with ogg/vorbis output.
 
 
+## requirements
+- linux OS
+- PHP webserver
+  - sqlite
+- cvlc (CLI vlc, usually namer vlc-nox)
+- 
+
 ## installation
 install debian / ubuntu package vlc-nox  
 if you're on ubuntu 12.04, see [instruction to compile VLC](vlc_compile.md)   

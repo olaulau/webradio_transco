@@ -32,7 +32,6 @@ function app_base_path() {
 
 $app_base_path = app_base_path();
 session_set_cookie_params(0, $app_base_path);
-session_start();
 
 
 require_once __DIR__.'/../admin/Admin.class.php';

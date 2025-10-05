@@ -6,8 +6,10 @@ require_once __DIR__.'/../../external/password.php';
 if(!empty($_POST['login']) && !empty($_POST['password'])) {
 // 	var_dump(password_verify($_POST['password'], $conf['admins'][$_POST['login']])); die;
 	if( isset($conf['admins'])  &&  password_verify($_POST['password'], $conf['admins'][$_POST['login']]) ) {
+		session_start();
 		$_SESSION['admin'] = TRUE;
 		$_SESSION['messages'][] = 'successfully signed in';
+		session_write_close();
 		header("Location: ".$_POST['redirect']);
 	}
 	else {

@@ -40,6 +40,7 @@ Stream::create_structure ();
 
 <div class="container" role="main">
 <?php
+session_start();
 if(!empty($_SESSION['messages'])) {
 	foreach ($_SESSION['messages'] as $message) {
 		?>
@@ -50,6 +51,7 @@ if(!empty($_SESSION['messages'])) {
 	}
 	unset($_SESSION['messages']);
 }
+session_write_close();
 ?>
 </div>
 

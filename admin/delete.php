@@ -11,7 +11,9 @@ if(!empty($_GET['id'])) {
 		Stream::prepare_db();
 		$s = Stream::find_stream($id);
 		$s->remove();
+		session_start();
 		$_SESSION['messages'][] = 'successfully deleted stream #'.$id;
+		session_write_close();
 		header("Location: ".$_SERVER['HTTP_REFERER']);
 	}
 	else {

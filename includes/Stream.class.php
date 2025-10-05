@@ -140,10 +140,12 @@ class Stream
 				)";
 // 	 		echo $create_sql; die;
 			Stream::$db->exec($create_sql);
+			session_start();
 			$_SESSION['messages'][] = 'created data structure';
-				
+			
 			Stream::insert_test_data(); //TODO remove later
 			$_SESSION['messages'][] = 'inserted test data';
+			session_write_close();
 		}
 	}
 	

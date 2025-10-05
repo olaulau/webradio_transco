@@ -3,8 +3,10 @@
 class Admin {
 	
 	public static function is_admin() {
-		//var_dump($_SESSION); die;
-		return (isset($_SESSION['admin']) && $_SESSION['admin'] === TRUE);
+		session_start();
+		$admin = $_SESSION['admin'] ?? null;
+		session_write_close();
+		return (isset($admin) && $admin === TRUE);
 	}
 	
 	public static function restrict() {
