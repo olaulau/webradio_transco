@@ -1,9 +1,10 @@
 <?php
 // https://wiki.videolan.org/Codec/
 
-class VLC_capabilities {
+class VLC_capabilities
+{
 	
-	public static $acodecs = array(
+	public static $acodecs = [
 		'mpga' 	=> 'MPEG audio',
 		'mp3' 	=> 'MPEG Layer 3 audio',
 		'mp4a'	=> 'AAC (Advanced Audio Coding)',
@@ -22,10 +23,10 @@ class VLC_capabilities {
 // 	    RealAudio
 // 	    MACE
 	    'mpc'	=> 'MusePack', 
-	);
+];
 	
 	
-	public static $muxers = array(
+	public static $muxers = [
 		'mpeg1' => 'MPEG-1 multiplexing',
 		'ts' 	=> 'MPEG Transport Stream',
 		'ps' 	=> 'MPEG Program Stream',
@@ -34,7 +35,7 @@ class VLC_capabilities {
 		'asf' 	=> 'ASF',
 		'dummy' => 'dummy output',
 		'ogg' 	=> 'Xiph.org\'s ogg container format',
-	);
+];
 	
 }
 

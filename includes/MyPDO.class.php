@@ -2,6 +2,7 @@
 
 require_once __DIR__.'/../external/log4php/Logger.php';
 
+//TODO remove completly
 class MyPDO extends PDO
 {
 	

@@ -254,7 +254,7 @@ class Stream
 	}
 	
 	
-	private static function dest_port()
+	private static function next_dest_port()
 	{
 		global $conf;
 		$select = "
@@ -283,6 +283,13 @@ class Stream
 		else {
 			return $conf['min_dest_port'];
 		}
+	}
+
+	private static function port_available (int $port) : bool
+	{
+		$cmd = "netstat -tulpn 2>/dev/null | tail -n +3 | grep :$port";
+		$output = `$cmd`;
+		return empty($output);
 	}
 	
 	
@@ -392,11 +399,14 @@ class Stream
 	{
 		global $conf;
 		if(!isset($this->pid)) {
-			$dest_port = Stream::dest_port();
-// 			echo $dest_port; die;
+			$dest_port = Stream::next_dest_port();
+			while(!self::port_available($dest_port)) {
+				$dest_port ++;
+			}
+
 			$command = $conf['vlc_executable'] . " -vvv " . $this->original_url . " --sout '#transcode{vcodec=none,acodec=" . $this->acodec . ",ab=" . $this->ab . "} :standard{access=http,mux=" . $this->mux . ",dst=:" . $dest_port . "/}'";
-// 			echo "launching : $command"; die;
 			$p = new Process($command);
+			$status = $p->status();
 			$this->pid = $p->getPid();
 			$this->dest_port = $dest_port;
 			$this->save();
