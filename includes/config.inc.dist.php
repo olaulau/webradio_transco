@@ -1,5 +1,5 @@
 <?php
-// fill in to your needs and rename this file 'config.inc.php
+// fill in to your needs and rename this file 'config.inc.php'
 
 
 // location of the VLC executable

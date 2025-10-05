@@ -1,5 +1,2 @@
-/.settings/
-/.project
-.buildpath
 data.sqlite
 includes/config.inc.php

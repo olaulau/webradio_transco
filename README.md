@@ -16,6 +16,6 @@ working great, specially with ogg/vorbis output.
 install debian / ubuntu package vlc-nox  
 if you're on ubuntu 12.04, see [instruction to compile VLC](vlc_compile.md)   
 ```git clone https://github.com/olaulau/webradio_transco```  
-modify and rename ```includes/config_EXAMPLE.inc.php```  
+modify and rename ```includes/config.inc.dist.php```  
 (default admin password is ```passwd```, you can generate a new one with this page : ```/admin/auth/passwd.php```  
 the first time you go to ```index.php```, it will create the database and a test Stream.  
