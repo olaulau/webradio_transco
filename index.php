@@ -83,6 +83,7 @@ session_write_close();
 					if(Admin::is_admin()) {
 						?>
 						<th rowspan=2>Original URL</th>
+						<th rowspan=2>Original track id</th>
 						<th colspan=2>internal VLC server</th>
 						<?php
 					}
@@ -121,6 +122,7 @@ foreach ( $streams as $s ) {
 		if(Admin::is_admin()) {
 			?>
 			<td><?=$s->get_original_url()?></td>
+			<td><?=$s->get_original_track_id()?></td>
 			<td><?=$s->get_dest_port()?></td>
 			<td><?=$s->get_pid()?></td>
 			<?php

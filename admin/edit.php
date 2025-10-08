@@ -66,6 +66,11 @@ else {
 			</div>
 
 			<div class="form-group form-group-lg">
+				<label for="original_track_id">Original URL</label> <input type="number" class="form-control" id="original_track_id"
+					name="original_track_id" placeholder="original track id" value="<?= $stream->get_original_track_id() ?>">
+			</div>
+
+			<div class="form-group form-group-lg">
 				<label for="acodec">Audio codec</label> <select class="form-control" id="acodec" name="acodec" required>
 				<?php
 				$acodec = $stream->get_acodec();

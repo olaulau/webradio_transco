@@ -28,6 +28,13 @@ bugs :
 - 
 
 
+NEXT :
+- novideo
+- select audio stream id
+- restream without reencode
+
+
+
 à faire :
 - contraintes sur les possibilités acodec / mux avec VLC
 - possibilité de ne pas transcoder (simple streaming), nécessaire au restreaming interne

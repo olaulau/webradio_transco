@@ -28,6 +28,7 @@ if(!empty($_POST['name']) && !empty($_POST['original_url']) && !empty($_POST['ac
 	
 	$tab['name'] = $_POST['name'];
 	$tab['original_url'] = $_POST['original_url'];
+	$tab['original_track_id'] = $_POST['original_track_id'];
 	$tab['acodec'] = $_POST['acodec'];
 	$tab['ab'] = $_POST['ab'];
 	$tab['mux'] = $_POST['mux'];

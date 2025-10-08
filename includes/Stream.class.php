@@ -14,6 +14,7 @@ class Stream
 	private $peak_viewers = 0;
 	private $total_viewers = 0;
 	private $original_url;
+	private $original_track_id;
 	private $acodec;
 	private $ab;
 	private $mux;
@@ -61,6 +62,8 @@ class Stream
 	public function remove_viewer()
 	{
 		$this->actual_viewers --;
+		if($this->actual_viewers < 0)
+			$this->actual_viewers = 0;
 	}
 	
 	public function get_peak_viewers()
@@ -76,7 +79,12 @@ class Stream
 	{
 		return $this->original_url;
 	}
-	
+
+	public function get_original_track_id()
+	{
+		return $this->original_track_id;
+	}
+
 	public function get_acodec()
 	{
 		return $this->acodec;
@@ -110,6 +118,7 @@ class Stream
 		}
 	}
 	
+
 	public static function create_structure()
 	{
 		// check db table created
@@ -122,6 +131,7 @@ class Stream
 		";
 		$stmt = Stream::$db->query($table_select);
 // 		var_dump($stmt->fetchColumn()); die;
+
 		if($stmt->fetchColumn() != 1) {
 // 			echo nl2br("creating table" . PHP_EOL);
 			$create_sql = "
@@ -132,8 +142,9 @@ class Stream
 					peak_viewers INTEGER NOT NULL DEFAULT 0,
 					total_viewers INTEGER NOT NULL DEFAULT 0,
 					original_url TEXT NOT NULL,
-					acodec TEXT NOT NULL,
-					ab INTEGER NOT NULL,
+					original_track_id INTEGER,
+					acodec TEXT,
+					ab INTEGER,
 					mux TEXT NOT NULL,
 					dest_port INTEGER,
 					pid INTEGER
@@ -149,22 +160,42 @@ class Stream
 		}
 	}
 	
+
 	public static function insert_test_data()
 	{
 		// insert test data
-		$row = array(
+		$row = [
 			'id' => NULL,
 			'name' => 'fréquence 3',
 			'actual_viewers' => 0,
 			'peak_viewers' => 0,
 			'total_viewers' => 0,
-			'original_url' => 'http://hd.stream.frequence3.net/frequence3-256.mp3',
+			'original_url' => 'https://frequence3.net-radio.fr/frequence3.flac',
+			'original_track_id'	=>	null,
 			'acodec' => 'vorb',
-			'ab' => 192,
+			'ab' => 256,
 			'mux' => 'ogg',
 			'dest_port' => NULL,
 			'pid' => NULL
-		);
+		];
+		$s = new Stream();
+		$s->fill_with_array($row);
+		$s->save();
+
+		$row = [
+			'id' => NULL,
+			'name' => 'skyrock',
+			'actual_viewers' => 0,
+			'peak_viewers' => 0,
+			'total_viewers' => 0,
+			'original_url' => 'rtsp://mafreebox.freebox.fr/fbxtv_pub/stream?namespace=1&service=100011',
+			'original_track_id'	=>	1004,
+			'acodec' => 'vorb',
+			'ab' => 128,
+			'mux' => 'ogg',
+			'dest_port' => NULL,
+			'pid' => NULL
+		];
 		$s = new Stream();
 		$s->fill_with_array($row);
 		$s->save();
@@ -317,6 +348,8 @@ class Stream
 			Stream::affect_int((isset($a['total_viewers'])?$a['total_viewers']:NULL), $this->total_viewers);
 		if(isset($a['original_url']))
 			Stream::affect_str((isset($a['original_url'])?$a['original_url']:NULL), $this->original_url);
+		if(isset($a['original_track_id']))
+			Stream::affect_int((isset($a['original_track_id'])?$a['original_track_id']:NULL), $this->original_track_id);
 		if(isset($a['acodec']))
 			Stream::affect_str((isset($a['acodec'])?$a['acodec']:NULL), $this->acodec);
 		if(isset($a['ab']))
@@ -337,7 +370,7 @@ class Stream
 		$pid = Stream::sql_nullable($this->pid);
 		$sql = "
 			INSERT OR REPLACE INTO ".Stream::$table_name."
-				( id, name, actual_viewers, peak_viewers, total_viewers, original_url, acodec, ab, mux, dest_port, pid )
+				( id, name, actual_viewers, peak_viewers, total_viewers, original_url, original_track_id, acodec, ab, mux, dest_port, pid )
 			VALUES ( ".
 				$id.", ".
 				"'".$this->name."', ".
@@ -345,6 +378,7 @@ class Stream
 				$this->peak_viewers.", ".
 				$this->total_viewers.", ".
 				"'".$this->original_url."', ".
+				Stream::sql_nullable($this->original_track_id).", ".
 				"'".$this->acodec."', ".
 				$this->ab.", ".
 				"'".$this->mux."', ".
@@ -374,7 +408,7 @@ class Stream
 		Stream::begin_transaction();
 		$this->refresh();
 // 		var_dump($this); die;
-		if($this->get_actual_viewers() === 0) { // only if needed
+		if($this->get_actual_viewers() <= 0) { // only if needed
 			$this->start_process();
 		}
 		$this->add_viewer();
@@ -405,20 +439,26 @@ class Stream
 			while(!self::port_available($dest_port)) {
 				$dest_port ++;
 			}
+			$this->dest_port = $dest_port;
 
-			$command = $conf['vlc_executable'] . " -vvv " . $this->original_url . " --sout '#transcode{vcodec=none,acodec=" . $this->acodec . ",ab=" . $this->ab . "} :standard{access=http,mux=" . $this->mux . ",dst=:" . $dest_port . "/}'";
+			$command = "
+				{$conf['vlc_executable']} -vvv '{$this->original_url}' \
+				 --no-video --sout-all --sout-keep \
+				 --sout '#transcode{vcodec=none,acodec={$this->acodec},ab={$this->ab}}:duplicate{dst=std{access=http,mux={$this->mux},dst=:{$this->dest_port}/},select='es={$this->original_track_id}'}'
+			";
+			// var_dump($command); die;
 			$p = new Process($command);
 			$status = $p->status();
 			$this->pid = $p->getPid();
-			$this->dest_port = $dest_port;
 			$this->save();
 		}
 		else {
 			die("already running");
 		}
+			$p = new Process($command);
 	}
-	
-	
+
+
 	private function stop_process()
 	{
 		if(isset($this->pid)) {
