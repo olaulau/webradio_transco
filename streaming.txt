@@ -28,10 +28,20 @@ bugs :
 - 
 
 
-NEXT :
-- novideo
-- select audio stream id
-- restream without reencode
+IDEAS :
+- new password : make input type password
+- force_stop : check if we really killed something
+- make vlc cmd flexible (track_id, transcode)
+- stream config with no transcode
+
+- integrated web player, so that we do not leave the index dashboard
+- generate m3U playlist
+- rewrited URL with stream name
+- cound bytes streamed
+
+- integrate pôject with olaulau's html skel
+- use recent version of twitter bootstrap
+- use f3 orm & config system
 
 
 

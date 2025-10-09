@@ -15,8 +15,8 @@ working great, specially with ogg/vorbis output.
 ## requirements
 - linux OS
 - PHP webserver
-  - sqlite
-- cvlc (CLI vlc, usually namer vlc-nox)
+  - pdo-sqlite
+- cvlc (CLI vlc)
 - 
 
 ## installation

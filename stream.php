@@ -51,7 +51,7 @@ if (FALSE === $handle) {
 }
 
 // send headers, so that it can be viewed directly in the browser with a plugin
-header('Content-type: audio/ogg'); //TODO
+header('Content-type: audio/ogg'); //TODO choose right mime type based on stream specs
 header('Cache-Control: no-cache');
 
 // start upstreaming (PHP)

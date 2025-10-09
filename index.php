@@ -79,16 +79,15 @@ session_write_close();
 					<th rowspan=2>#</th>
 					<th rowspan=2>Name</th>
 					<th colspan=3>listeners</th>
+					<th rowspan=2>transcoded format</th>
 					<?php
 					if(Admin::is_admin()) {
 						?>
-						<th rowspan=2>Original URL</th>
-						<th rowspan=2>Original track id</th>
+						<th colspan=2>Original stream</th>
 						<th colspan=2>internal VLC server</th>
 						<?php
 					}
 					?>
-					<th rowspan=2>transcoded format</th>
 					<th rowspan=2>lien</th>
 					<?php if(Admin::is_admin()) {?> <th rowspan=2>actions</th> <?php } ?>
 				</tr>
@@ -99,6 +98,9 @@ session_write_close();
 					<?php
 					if(Admin::is_admin()) {
 						?>
+						<th>URL</th>
+						<th>track id</th>
+
 						<th>HTTP port</th>
 						<th>PID</th>
 						<?php
@@ -118,6 +120,7 @@ foreach ( $streams as $s ) {
 		<td><?=$s->get_actual_viewers()?></td>
 		<td><?=$s->get_peak_viewers()?></td>
 		<td><?=$s->get_total_viewers()?></td>
+		<td><?=$s->get_mux() . ' ' . $s->get_acodec() . ' ' . $s->get_ab() . ' kbps'?></td>
 		<?php
 		if(Admin::is_admin()) {
 			?>
@@ -128,7 +131,6 @@ foreach ( $streams as $s ) {
 			<?php
 		}
 		?>
-		<td><?=$s->get_mux() . ' ' . $s->get_acodec() . ' ' . $s->get_ab() . ' kbps'?></td>
 		<td><a href="stream.php?id=<?= $s->get_id()?>"><span class="glyphicon glyphicon-play" aria-hidden="true" title="play"></span></a></td>
 		<?php
 		if(Admin::is_admin()) {
