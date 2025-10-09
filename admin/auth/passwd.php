@@ -38,7 +38,7 @@ require_once __DIR__.'/../../external/password.php';
       <form class="form-signin" action="passwd.php" method="post">
         <h2 class="form-signin-heading">Enter your pasword</h2>
 <!--         <label for="password" class="sr-only">Password</label> -->
-        <input type="text" id="password" name="password" class="form-control" placeholder="Password" required value="<?= isset($_POST['password']) ? $_POST['password'] : '' ?>">
+        <input type="password" id="password" name="password" class="form-control" placeholder="Password" required value="<?= isset($_POST['password']) ? $_POST['password'] : '' ?>">
         <?php
 		if(!empty($_POST['password'])) {
 			echo nl2br('You can modify includes/config.inc.php with this value :' . PHP_EOL . password_hash($_POST['password'], PASSWORD_BCRYPT));

@@ -29,7 +29,6 @@ bugs :
 
 
 IDEAS :
-- new password : make input type password
 - force_stop : check if we really killed something
 - make vlc cmd flexible (track_id, transcode)
 - stream config with no transcode
