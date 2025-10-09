@@ -458,17 +458,17 @@ class Stream
 
 	private function stop_process()
 	{
-		if(isset($this->pid)) {
-			$p = new Process();
-			$p->setPid($this->get_pid());
-			$ret = $p->stop();
-			$this->dest_port = null;
-			$this->pid = null;
-			$this->save();
-		}
-		else {
+		if (empty($this->pid)) {
 			die("not running");
 		}
+
+		$p = new Process();
+		$p->setPid($this->get_pid());
+		$ret = $p->stop();
+		// var_dump($ret); die;
+		$this->dest_port = null;
+		$this->pid = null;
+		$this->save();
 	}
 	
 	
@@ -476,7 +476,7 @@ class Stream
 	{
 		Stream::begin_transaction();
 		$this->refresh();
-		// 		var_dump($this); die;
+		// var_dump($this); die;
 		$this->actual_viewers = 0;
 		$this->save();
 		Stream::end_transaction();

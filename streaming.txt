@@ -32,6 +32,7 @@ IDEAS :
 - force_stop : check if we really killed something
 - make vlc cmd flexible (track_id, transcode)
 - stream config with no transcode
+- flash messages : display as overlay (absolute), so that everything is not shifted
 
 - integrated web player, so that we do not leave the index dashboard
 - generate m3U playlist

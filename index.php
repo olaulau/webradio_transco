@@ -77,35 +77,47 @@ session_write_close();
 			<thead>
 				<tr>
 					<th rowspan=2>#</th>
+					<th rowspan=2>écouter</th>
 					<th rowspan=2>Name</th>
-					<th colspan=3>listeners</th>
-					<th rowspan=2>transcoded format</th>
 					<?php
 					if(Admin::is_admin()) {
 						?>
 						<th colspan=2>Original stream</th>
+						<?php
+					}
+					?>
+					<th rowspan=2>transcoded format</th>
+					<?php
+					if(Admin::is_admin()) {
+						?>
 						<th colspan=2>internal VLC server</th>
 						<?php
 					}
 					?>
-					<th rowspan=2>lien</th>
-					<?php if(Admin::is_admin()) {?> <th rowspan=2>actions</th> <?php } ?>
+					<th colspan=3>listeners</th>
+					<?php
+					if(Admin::is_admin()) {
+						?>
+						<th rowspan=2>actions</th>
+						<?php
+					}
+					?>
 				</tr>
 				<tr>
-					<th>actual</th>
-					<th>peak</th>
-					<th>total</th>
 					<?php
 					if(Admin::is_admin()) {
 						?>
 						<th>URL</th>
 						<th>track id</th>
-
+						
 						<th>HTTP port</th>
 						<th>PID</th>
 						<?php
 					}
 					?>
+					<th>actual</th>
+					<th>peak</th>
+					<th>total</th>
 				</tr>
 			</thead>
 			<tbody>
@@ -116,22 +128,28 @@ foreach ( $streams as $s ) {
 	?>
 	<tr>
 		<td><?=$s->get_id()?></td>
+		<td><a href="stream.php?id=<?= $s->get_id()?>"><span class="glyphicon glyphicon-play" aria-hidden="true" title="play"></span></a></td>
 		<td><?=$s->get_name()?></td>
-		<td><?=$s->get_actual_viewers()?></td>
-		<td><?=$s->get_peak_viewers()?></td>
-		<td><?=$s->get_total_viewers()?></td>
-		<td><?=$s->get_mux() . ' ' . $s->get_acodec() . ' ' . $s->get_ab() . ' kbps'?></td>
 		<?php
 		if(Admin::is_admin()) {
 			?>
 			<td><?=$s->get_original_url()?></td>
 			<td><?=$s->get_original_track_id()?></td>
+			<?php
+		}
+		?>
+		<td><?=$s->get_mux() . ' ' . $s->get_acodec() . ' ' . $s->get_ab() . ' kbps'?></td>
+		<?php
+		if(Admin::is_admin()) {
+			?>
 			<td><?=$s->get_dest_port()?></td>
 			<td><?=$s->get_pid()?></td>
 			<?php
 		}
 		?>
-		<td><a href="stream.php?id=<?= $s->get_id()?>"><span class="glyphicon glyphicon-play" aria-hidden="true" title="play"></span></a></td>
+		<td><?=$s->get_actual_viewers()?></td>
+		<td><?=$s->get_peak_viewers()?></td>
+		<td><?=$s->get_total_viewers()?></td>
 		<?php
 		if(Admin::is_admin()) {
 		?>
