@@ -407,7 +407,6 @@ class Stream
 	{
 		Stream::begin_transaction();
 		$this->refresh();
-// 		var_dump($this); die;
 		if($this->get_actual_viewers() <= 0) { // only if needed
 			$this->start_process();
 		}
@@ -421,7 +420,6 @@ class Stream
 	{
 		Stream::begin_transaction();
 		$this->refresh();
-// 		var_dump($this); die;
 		if($this->get_actual_viewers() === 1) { // only if needed
 			$this->stop_process();
 		}
@@ -444,7 +442,7 @@ class Stream
 			$command = "
 				{$conf['vlc_executable']} -vvv '{$this->original_url}' \
 				 --no-video --sout-all --sout-keep \
-				 --sout '#transcode{vcodec=none,acodec={$this->acodec},ab={$this->ab}}:duplicate{dst=std{access=http,mux={$this->mux},dst=:{$this->dest_port}/},select='es={$this->original_track_id}'}'
+				 --sout '#transcode{vcodec=none,acodec={$this->acodec},ab={$this->ab}}:duplicate{dst=std{access=http,mux={$this->mux},dst=:{$this->dest_port}/},select='es={$this->original_track_id}'}' \
 			";
 			// var_dump($command); die;
 			$p = new Process($command);
@@ -455,7 +453,6 @@ class Stream
 		else {
 			die("already running");
 		}
-			$p = new Process($command);
 	}
 
 
