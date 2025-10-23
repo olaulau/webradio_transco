@@ -1,5 +1,5 @@
 <?php
-require_once __DIR__.'/includes/ALL.inc.php';
+require_once __DIR__ . '/includes/ALL.inc.php';
 
 if(empty($_GET['id'])) {
 	die("no stream id specified");
@@ -13,7 +13,7 @@ if(!ctype_digit($id) || $id <= 0) {
 $id = (int)$id;
 
 // DB
-Stream::prepare_db();
+StreamMdl::prepare_db();
 
 
 // register shutdown callback :
@@ -22,8 +22,8 @@ Stream::prepare_db();
 function shutdown()
 {
 	global $id;
-	try { Stream::end_transaction(); } catch(Exception $ex) {}
-	$stream = Stream::find_stream($id);
+	try { StreamMdl::end_transaction(); } catch(Exception $ex) {}
+	$stream = StreamSvc::find_stream($id);
 	if(isset($stream))
 		$stream->stop();
 }
@@ -31,7 +31,7 @@ register_shutdown_function('shutdown');
 
 
 // start the stream server
-$stream = Stream::find_stream($id);
+$stream = StreamSvc::find_stream($id);
 if(!isset($stream)) {
 	die("stream not found in DB");
 }

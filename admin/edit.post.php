@@ -1,5 +1,5 @@
 <?php
-require_once __DIR__.'/../includes/ALL.inc.php';
+require_once __DIR__ . '/../includes/ALL.inc.php';
 
 // print_r($_POST); die;
 if(!empty($_POST['name']) && !empty($_POST['original_url']) && !empty($_POST['acodec']) && !empty($_POST['ab']) && !empty($_POST['mux'])) {
@@ -7,12 +7,12 @@ if(!empty($_POST['name']) && !empty($_POST['original_url']) && !empty($_POST['ac
 		die("incorrect audio bitrate");
 	
 	$tab = array();
-	Stream::prepare_db();
+	StreamMdl::prepare_db();
 	if(!empty($_POST['id'])) {
 		$id = $_POST['id'];
 		if(ctype_digit($id) && $id > 0) {
 			$id = (int)$id;
-			$stream = Stream::find_stream($id);
+			$stream = StreamSvc::find_stream($id);
 			if(!isset($stream)) {
 				die("stream not found in DB");
 			}
@@ -23,7 +23,7 @@ if(!empty($_POST['name']) && !empty($_POST['original_url']) && !empty($_POST['ac
 		}
 	}
 	else {
-		$stream = new Stream();
+		$stream = new StreamSvc();
 	}
 	
 	$tab['name'] = $_POST['name'];

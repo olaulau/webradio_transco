@@ -34,8 +34,11 @@ $app_base_path = app_base_path();
 session_set_cookie_params(0, $app_base_path);
 
 
-require_once __DIR__.'/../admin/Admin.class.php';
+require_once __DIR__ . '/../admin/Admin.class.php';
 
-require_once __DIR__.'/../includes/config.inc.php';
-require_once __DIR__.'/../includes/Stream.class.php';
-require_once __DIR__.'/../includes/VLC_capabilities.class.php';
+require_once __DIR__ . '/../includes/config.inc.php';
+require_once __DIR__ . '/../includes/StreamMdl.php';
+require_once __DIR__ . '/../includes/StreamSvc.php';
+require_once __DIR__ . '/../includes/VLC_capabilities.class.php';
+
+require_once __DIR__ . '/../external/Process.class.php';

@@ -1,9 +1,9 @@
 <?php
-require_once __DIR__.'/includes/ALL.inc.php';
+require_once __DIR__ . '/includes/ALL.inc.php';
 
 // DB
-Stream::prepare_db ();
-Stream::create_structure ();
+StreamMdl::prepare_db ();
+StreamMdl::create_structure ();
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -123,7 +123,7 @@ session_write_close();
 			<tbody>
 
 <?php
-$streams = Stream::get_all ();
+$streams = StreamMdl::get_all ();
 foreach ( $streams as $s ) {
 	?>
 	<tr>

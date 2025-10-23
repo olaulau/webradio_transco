@@ -1,24 +1,22 @@
 <?php
+require_once __DIR__ . '/../includes/ALL.inc.php';
 
-require_once __DIR__ . '/../external/Process.class.php';
-require_once __DIR__ . '/config.inc.php';
-
-class Stream
+class StreamMdl
 {
 	
 	/// attributes ///
-	private $id = null;
-	private $name;
-	private $actual_viewers = 0;
-	private $peak_viewers = 0;
-	private $total_viewers = 0;
-	private $original_url;
-	private $original_track_id;
-	private $acodec;
-	private $ab;
-	private $mux;
-	private $dest_port;
-	private $pid;
+	protected $id = null;
+	protected $name;
+	protected $actual_viewers = 0;
+	protected $peak_viewers = 0;
+	protected $total_viewers = 0;
+	protected $original_url;
+	protected $original_track_id;
+	protected $acodec;
+	protected $ab;
+	protected $mux;
+	protected $dest_port;
+	protected $pid;
 	
 	private static $db;
 	
@@ -110,10 +108,10 @@ class Stream
 	public static function prepare_db()
 	{
 		// check db object created
-		if(!isset(Stream::$db)) {
+		if(!isset(self::$db)) {
 // 			echo nl2br("connecting to sqlite db" . PHP_EOL);
-			Stream::$db = new PDO('sqlite:' . Stream::sqlite_filename());
-			Stream::$db->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+			self::$db = new PDO('sqlite:' . self::sqlite_filename());
+			self::$db->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 		}
 	}
 	
@@ -125,16 +123,16 @@ class Stream
 			SELECT	count(*)
 			FROM	sqlite_master
 			WHERE	type='table'
-			AND		name='" . Stream::$table_name . "'
+			AND		name='" . self::$table_name . "'
 			COLLATE	NOCASE
 		";
-		$stmt = Stream::$db->query($table_select);
+		$stmt = self::$db->query($table_select);
 // 		var_dump($stmt->fetchColumn()); die;
 
 		if($stmt->fetchColumn() != 1) {
 // 			echo nl2br("creating table" . PHP_EOL);
 			$create_sql = "
-				CREATE TABLE ".Stream::$table_name."(
+				CREATE TABLE ".self::$table_name."(
 					id INTEGER PRIMARY KEY,
 					name TEXT NOT NULL,
 					actual_viewers INTEGER NOT NULL DEFAULT 0,
@@ -149,11 +147,11 @@ class Stream
 					pid INTEGER
 				)";
 // 	 		echo $create_sql; die;
-			Stream::$db->exec($create_sql);
+			self::$db->exec($create_sql);
 			session_start();
 			$_SESSION['messages'][] = 'created data structure';
 			
-			Stream::insert_test_data(); //TODO remove later
+			self::insert_test_data(); //TODO remove later
 			$_SESSION['messages'][] = 'inserted test data';
 			session_write_close();
 		}
@@ -201,15 +199,15 @@ class Stream
 	}
 	
 	
-	public static function find_stream($id, $dest=null) : ?self
+	public static function find_stream($id, $dest=null) : ?static
 	{
 		$sql = "
 			SELECT	*
-			FROM	".Stream::$table_name."
+			FROM	".self::$table_name."
 			WHERE	id = ".$id."
 		";
 // 		echo $sql; die;
-		$stmt = Stream::$db->query($sql);
+		$stmt = self::$db->query($sql);
 		$stmt->setFetchMode(PDO::FETCH_ASSOC);
 		$row = $stmt->fetch();
 // 		echo "<pre>", var_dump($row); echo "</pre>";
@@ -217,7 +215,7 @@ class Stream
 		if(isset($dest))
 			$res = &$dest;
 		else
-			$res = new Stream();
+			$res = new static();
 
 		if($row === FALSE)
 			$res = NULL;
@@ -232,13 +230,13 @@ class Stream
 	{
 		$select = "
 			SELECT	*
-			FROM	".Stream::$table_name."
+			FROM	".self::$table_name."
 		";
-		$stmt = Stream::$db->query($select);
+		$stmt = self::$db->query($select);
 		$stmt->setFetchMode(PDO::FETCH_ASSOC);
 		$res = array();
 		foreach ($stmt as $row) {
-			$s = new Stream();
+			$s = new self();
 			$s->fill_with_array($row);
 			$res[] = $s;
 		}
@@ -277,33 +275,33 @@ class Stream
 	public static function begin_transaction()
 	{
 		$sql = "BEGIN TRANSACTION";
-		Stream::$db->exec($sql);
+		self::$db->exec($sql);
 	}
 	public static function end_transaction()
 	{
 		$sql = "END TRANSACTION";
-		Stream::$db->exec($sql);
+		self::$db->exec($sql);
 	}
 	
 	
-	private static function next_dest_port()
+	protected static function next_dest_port()
 	{
 		global $conf;
 		$select = "
 			SELECT COUNT(*) AS nb
-			FROM ".Stream::$table_name."
+			FROM ".self::$table_name."
 			WHERE dest_port IS NOT NULL
 		";
-		$stmt = Stream::$db->query($select);
+		$stmt = self::$db->query($select);
 		$stmt->setFetchMode(PDO::FETCH_ASSOC);
 		$row = $stmt->fetch();
 		// 		echo "NB=".$row['nb']; die;
 		if($row['nb'] > 0) {
 			$select = "
 				SELECT max(dest_port) AS dest_port
-				FROM ".Stream::$table_name."
+				FROM ".self::$table_name."
 			";
-			$stmt = Stream::$db->query($select);
+			$stmt = self::$db->query($select);
 			$stmt->setFetchMode(PDO::FETCH_ASSOC);
 			$row = $stmt->fetch();
 			$dest_port = (int)$row['dest_port'] + 1;
@@ -317,58 +315,53 @@ class Stream
 		}
 	}
 
-	private static function port_available (int $port) : bool
-	{
-		$cmd = "netstat -tulpn 2>/dev/null | tail -n +3 | grep :$port";
-		$output = `$cmd`;
-		return empty($output);
-	}
+
 	
 	
 	/// methods ///
 	public function refresh()
 	{
 // 		echo "<pre>"; print_r($this); echo "</pre>"; die;
-		Stream::find_stream($this->id, $this);
+		self::find_stream($this->id, $this);
 	}
 	
 	
 	public function fill_with_array($a)
 	{
 		if(isset($a['id']))
-			Stream::affect_nullable_int((isset($a['id'])?$a['id']:NULL), $this->id); // null in case of creation
+			self::affect_nullable_int((isset($a['id'])?$a['id']:NULL), $this->id); // null in case of creation
 		if(isset($a['name']))
-			Stream::affect_str((isset($a['name'])?$a['name']:NULL), $this->name);
+			self::affect_str((isset($a['name'])?$a['name']:NULL), $this->name);
 		if(isset($a['actual_viewers']))
-			Stream::affect_int((isset($a['actual_viewers'])?$a['actual_viewers']:NULL), $this->actual_viewers);
+			self::affect_int((isset($a['actual_viewers'])?$a['actual_viewers']:NULL), $this->actual_viewers);
 		if(isset($a['peak_viewers']))
-			Stream::affect_int((isset($a['peak_viewers'])?$a['peak_viewers']:NULL), $this->peak_viewers);
+			self::affect_int((isset($a['peak_viewers'])?$a['peak_viewers']:NULL), $this->peak_viewers);
 		if(isset($a['total_viewers']))
-			Stream::affect_int((isset($a['total_viewers'])?$a['total_viewers']:NULL), $this->total_viewers);
+			self::affect_int((isset($a['total_viewers'])?$a['total_viewers']:NULL), $this->total_viewers);
 		if(isset($a['original_url']))
-			Stream::affect_str((isset($a['original_url'])?$a['original_url']:NULL), $this->original_url);
+			self::affect_str((isset($a['original_url'])?$a['original_url']:NULL), $this->original_url);
 		if(isset($a['original_track_id']))
-			Stream::affect_int((isset($a['original_track_id'])?$a['original_track_id']:NULL), $this->original_track_id);
+			self::affect_int((isset($a['original_track_id'])?$a['original_track_id']:NULL), $this->original_track_id);
 		if(isset($a['acodec']))
-			Stream::affect_str((isset($a['acodec'])?$a['acodec']:NULL), $this->acodec);
+			self::affect_str((isset($a['acodec'])?$a['acodec']:NULL), $this->acodec);
 		if(isset($a['ab']))
-			Stream::affect_int((isset($a['ab'])?$a['ab']:NULL), $this->ab);
+			self::affect_int((isset($a['ab'])?$a['ab']:NULL), $this->ab);
 		if(isset($a['mux']))
-			Stream::affect_str((isset($a['mux'])?$a['mux']:NULL), $this->mux);
+			self::affect_str((isset($a['mux'])?$a['mux']:NULL), $this->mux);
 		if(isset($a['dest_port']))
-			Stream::affect_nullable_int((isset($a['dest_port'])?$a['dest_port']:NULL), $this->dest_port);
+			self::affect_nullable_int((isset($a['dest_port'])?$a['dest_port']:NULL), $this->dest_port);
 		if(isset($a['pid']))
-			Stream::affect_nullable_int((isset($a['pid'])?$a['pid']:NULL), $this->pid);
+			self::affect_nullable_int((isset($a['pid'])?$a['pid']:NULL), $this->pid);
 	}
 	
 	
 	public function save()
 	{
-		$id = Stream::sql_nullable($this->id);
-		$dest_port = Stream::sql_nullable($this->dest_port);
-		$pid = Stream::sql_nullable($this->pid);
+		$id = self::sql_nullable($this->id);
+		$dest_port = self::sql_nullable($this->dest_port);
+		$pid = self::sql_nullable($this->pid);
 		$sql = "
-			INSERT OR REPLACE INTO ".Stream::$table_name."
+			INSERT OR REPLACE INTO ".self::$table_name."
 				( id, name, actual_viewers, peak_viewers, total_viewers, original_url, original_track_id, acodec, ab, mux, dest_port, pid )
 			VALUES ( ".
 				$id.", ".
@@ -377,7 +370,7 @@ class Stream
 				$this->peak_viewers.", ".
 				$this->total_viewers.", ".
 				"'".$this->original_url."', ".
-				Stream::sql_nullable($this->original_track_id).", ".
+				self::sql_nullable($this->original_track_id).", ".
 				"'".$this->acodec."', ".
 				$this->ab.", ".
 				"'".$this->mux."', ".
@@ -386,115 +379,22 @@ class Stream
 			." )";
 // 		echo "<pre>"; echo $sql; echo "</pre>"; die;
 		
-		Stream::$db->exec($sql);
+		self::$db->exec($sql);
 		if(!isset($this->id))
-	 		$this->id = Stream::$db->lastInsertId();
+	 		$this->id = self::$db->lastInsertId();
 	}
 	
 	
 	public function remove()
 	{
 		$sql = "
-			DELETE FROM ".Stream::$table_name."
+			DELETE FROM ".self::$table_name."
 			WHERE	id = " . $this->id;
 // 		echo "<pre>"; echo $sql; echo "</pre>"; die
-		Stream::$db->exec($sql);
+		self::$db->exec($sql);
 	}
 	
 	
-	public function start()
-	{
-		Stream::begin_transaction();
-		$this->refresh();
-		if($this->get_actual_viewers() <= 0) { // only if needed
-			$this->start_process();
-		}
-		$this->add_viewer();
-		$this->save();
-		Stream::end_transaction();
-	}
 	
-	
-	public function stop()
-	{
-		Stream::begin_transaction();
-		$this->refresh();
-		if($this->get_actual_viewers() === 1) { // only if needed
-			$this->stop_process();
-		}
-		$this->remove_viewer();
-		$this->save();
-		Stream::end_transaction();
-	}
-	
- 
-	private function start_process()
-	{
-		global $conf;
-		if(!isset($this->pid)) {
-			$dest_port = Stream::next_dest_port();
-			while(!self::port_available($dest_port)) {
-				$dest_port ++;
-			}
-			$this->dest_port = $dest_port;
-
-			$command = "
-				{$conf['vlc_executable']} -vvv '{$this->original_url}' \
-				 --no-video --sout-all --sout-keep \
-				 --sout '#transcode{vcodec=none,acodec={$this->acodec},ab={$this->ab}}:duplicate{dst=std{access=http,mux={$this->mux},dst=:{$this->dest_port}/},select='es={$this->original_track_id}'}' \
-			";
-			// var_dump($command); die;
-			$p = new Process($command);
-			$status = $p->status();
-			$this->pid = $p->getPid();
-			$this->save();
-		}
-		else {
-			die("already running");
-		}
-	}
-
-
-	private function stop_process()
-	{
-		if (empty($this->pid)) {
-			die("not running");
-		}
-
-		$p = new Process();
-		$p->setPid($this->get_pid());
-		$ret = $p->stop();
-		// var_dump($ret); die;
-		$this->dest_port = null;
-		$this->pid = null;
-		$this->save();
-	}
-	
-	
-	public function force_stop()
-	{
-		Stream::begin_transaction();
-		$this->refresh();
-		// var_dump($this); die;
-		$this->actual_viewers = 0;
-		$this->save();
-		Stream::end_transaction();
-		$this->stop_process();
-	}
-	
-	
-	public function test_http()
-	{
-		$connection = @fsockopen("localhost", $this->dest_port);
-		return is_resource($connection);
-	}
 	
 }
-
-
-/// test ///
-// Stream::prepare_db();
-// $s = new Stream();
-// $s->save();
-// $s->add_viewer();
-// $s->save();

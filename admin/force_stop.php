@@ -14,8 +14,8 @@ if(!ctype_digit($id) || $id <= 0) {
 
 $id = (int)$id;
 // DB
-Stream::prepare_db();
-$s = Stream::find_stream($id);
+StreamMdl::prepare_db();
+$s = StreamSvc::find_stream($id);
 $s->force_stop();
 session_start();
 $_SESSION['messages'][] = 'successfully stopped the stream #'.$id;

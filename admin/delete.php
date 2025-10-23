@@ -8,8 +8,8 @@ if(!empty($_GET['id'])) {
 	if(ctype_digit($id) && $id > 0) {
 		$id = (int)$id;
 		// DB
-		Stream::prepare_db();
-		$s = Stream::find_stream($id);
+		StreamMdl::prepare_db();
+		$s = StreamSvc::find_stream($id);
 		$s->remove();
 		session_start();
 		$_SESSION['messages'][] = 'successfully deleted stream #'.$id;

@@ -1,5 +1,5 @@
 <?php
-require_once __DIR__.'/../includes/ALL.inc.php';
+require_once __DIR__ . '/../includes/ALL.inc.php';
 
 Admin::restrict();
 
@@ -7,8 +7,8 @@ if(!empty($_GET['id'])) {
 	$id = $_GET['id'];
 	if(ctype_digit($id) && $id > 0) {
 		$id = (int)$id;
-		Stream::prepare_db();
-		$stream = Stream::find_stream($id);
+		StreamMdl::prepare_db();
+		$stream = StreamSvc::find_stream($id);
 		if(!isset($stream)) {
 			die("id doesn't exist");
 		}
@@ -18,7 +18,7 @@ if(!empty($_GET['id'])) {
 	}
 }
 else {
-	$stream = new Stream();
+	$stream = new StreamSvc();
 }
 ?>
 <!DOCTYPE html>
