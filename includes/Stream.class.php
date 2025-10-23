@@ -2,7 +2,6 @@
 
 require_once __DIR__ . '/../external/Process.class.php';
 require_once __DIR__ . '/config.inc.php';
-// require_once __DIR__.'/MyPDO.class.php';
 
 class Stream
 {
@@ -113,7 +112,7 @@ class Stream
 		// check db object created
 		if(!isset(Stream::$db)) {
 // 			echo nl2br("connecting to sqlite db" . PHP_EOL);
-			Stream::$db = new /*My*/PDO('sqlite:' . Stream::sqlite_filename()); //TODO MyPDO -> PDO ?
+			Stream::$db = new PDO('sqlite:' . Stream::sqlite_filename());
 			Stream::$db->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 		}
 	}

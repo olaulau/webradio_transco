@@ -37,9 +37,11 @@ IDEAS :
 - integrated web player, so that we do not leave the index dashboard
 - generate m3U playlist
 - rewrited URL with stream name
-- cound bytes streamed
+- count bytes streamed
+- stream status : idle, starting, streaming, stopping
+- check vlc executable rpesence & version
 
-- integrate pôject with olaulau's html skel
+- integrate project with olaulau's html skel
 - use recent version of twitter bootstrap
 - use f3 orm & config system
 
